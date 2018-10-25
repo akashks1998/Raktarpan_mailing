@@ -1,4 +1,12 @@
 var express = require('express');
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/mydb";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  console.log("Database created!");
+  db.close();
+});
 var crypto = require('crypto');
 var router = express.Router();
 class user {
@@ -31,6 +39,10 @@ class user {
   }
 
   adddead(deadline, hour, name) {
+    if(hour<0){
+      this.err++;
+      return;
+    }
     this.deadline.push([deadline, hour, name]);
     this.deadline.sort(
       function (a, b) {
@@ -46,7 +58,7 @@ class user {
       this.scedule = [0, 0, "Sleep"];
       return;
     }
-    if (this.x < this.fixed[0][0]) {
+    if (this.deadline.length!=0&&(this.fixed.length==0||this.x < this.fixed[0][0])) {
       if (this.deadline[0][1] <= 0) {
         this.deadline.shift();
         this.sceduler();
@@ -62,9 +74,9 @@ class user {
       this.scedule = this.deadline[0];
       return;
 
-    } else if (this.x >= this.fixed[0][0] && this.x <= this.fixed[0][1]) {
+    } else if (this.fixed.length!=0&&this.x >= this.fixed[0][0] && this.x <= this.fixed[0][1]) {
       this.scedule = this.fixed[0];
-    } else if (this.x > this.fixed[0][1]) {
+    } else if (this.fixed.length!=0&&this.x > this.fixed[0][1]) {
       this.fixed.shift();
       this.sceduler();
       return;
@@ -86,5 +98,5 @@ router.post('/', function (req, res, next) {
   }
   res.send(JSON.stringify(u1));
 });
-
+setInterval(u1.sceduler,3600000);
 module.exports = router;
