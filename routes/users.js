@@ -1,7 +1,7 @@
 var express = require("express");
 var MongoClient = require("mongodb").MongoClient;
 var url = "mongodb://localhost:27017/mydb";
-
+let id=0;
 MongoClient.connect(
   url,
   function(err, db) {
@@ -21,6 +21,8 @@ class user {
       .digest("hex");
     this.fixed = [];
     this.deadline = [];
+    this.idfix=0;
+    this.iddead=0;
     this.scedule = [];
     this.err = 0;
     this.hour = 0;
@@ -37,10 +39,11 @@ class user {
         return;
       }
     });
-    this.fixed.push([start, end, name]);
+    this.fixed.push([start, end, name,this.idfix]);
     this.fixed.sort(function(a, b) {
       return a[0] > b[0] ? 1 : -1;
     });
+    this.idfix=this.idfix+1;
     this.sceduler();
   }
 
@@ -49,12 +52,28 @@ class user {
       this.err++;
       return;
     }
-    this.deadline.push([deadline, hour, name]);
+    this.deadline.push([deadline, hour, name,this.iddead]);
     this.deadline.sort(function(a, b) {
       return a[0] > b[0] ? 1 : -1;
     });
+    this.iddead=this.iddead+1;
     this.sceduler();
   }
+  updatefixed(id,updte){
+    for(i=0;i<this.fixed.length;i++){
+      if(this.fixed[i][3]==id){
+        this.fixed[i]=updte;
+      }
+    }
+  }
+  updatedead(id,updte){
+    for(i=0;i<this.deadline.length;i++){
+      if(this.deadline[i][3]==id){
+        this.deadline[i]=updte;
+      }
+    }
+  }
+  
   sceduler() {
     this.x = new Date();
     console.log(this.x.getHours());
@@ -111,6 +130,10 @@ class user {
   }
 }
 let u1 = new user("akash", "password");
+let users=[];
+for(i=0;i<10;i++){
+  users.push(new user("akash", "password"));
+}
 /* GET users listing. */
 router.get("/", function(req, res, next) {
   res.send(JSON.stringify(u1));
@@ -129,5 +152,11 @@ router.post("/", function(req, res, next) {
   }
   res.send(JSON.stringify(u1));
 });
-setInterval(u1.sceduler, 3600000);
+
+setInterval(function scedule(){
+  for(i=0;i<users.length;i++){
+    users.scedule();
+  }
+}
+  , 3600000);
 module.exports = router;

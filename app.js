@@ -23,6 +23,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.get('*', function(req, res) { res.render('404', { title: 'Page Not Found'}); });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
