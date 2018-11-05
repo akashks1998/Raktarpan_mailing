@@ -1,8 +1,8 @@
 var express = require("express");
 
-var url = "mongodb://localhost:27017/mydb";
 let id = 0;
 var crypto = require("crypto");
+
 var router = express.Router();
 class user {
   constructor(nam, pas) {
@@ -131,11 +131,19 @@ for (i = 0; i < 10; i++) {
 }
 /* GET users listing. */
 router.get("/", function(req, res, next) {
+  if(req.session.user==undefined||req.session.pass==undefined){
+    res.render('index');
+    return;
+  }
   console.log(req.session.user);
   res.send(JSON.stringify(u1));
 });
 
 router.post("/", function(req, res, next) {
+  if(req.session.user==undefined||req.session.pass==undefined){
+    res.render('index');
+    return;
+  }
   if (req.body.start && req.body.end) {
     u1.addfixed(
       new Date(req.body.start),

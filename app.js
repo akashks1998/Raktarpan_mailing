@@ -52,6 +52,18 @@ app.post('/login',function(req,res){
   sess.user=req.body.user;
   res.redirect('/users');
 });
+app.post('/logout',function(req,res){
+  req.session.destroy();
+//In this we are assigning email to sess.email variable.
+//email comes from HTML page.
+  res.redirect('/users');
+});
+app.get('/logout',function(req,res){
+  req.session.destroy();
+//In this we are assigning email to sess.email variable.
+//email comes from HTML page.
+  res.redirect('/index');
+});
 app.get('*', function(req, res) { res.render('404', { title: 'Page Not Found'}); });
 
 // catch 404 and forward to error handler
