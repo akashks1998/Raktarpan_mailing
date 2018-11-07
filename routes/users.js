@@ -1,19 +1,19 @@
 var express = require("express");
-var MongoClient = require('mongodb').MongoClient;
+var MongoClient = require("mongodb").MongoClient;
 var url = "mongodb://localhost:27017/";
 let id = 0;
 var crypto = require("crypto");
 
 var router = express.Router();
 class user {
-  constructor(nam, pas,email) {
+  constructor(nam, pas, email) {
     this.nam = nam;
     this.pas = crypto
       .createHash("md5")
       .update(pas)
       .digest("hex");
     this.fixed = [];
-    this.email=email;
+    this.email = email;
     this.deadline = [];
     this.idfix = 0;
     this.iddead = 0;
@@ -23,7 +23,7 @@ class user {
   }
   load(obj) {
     this.nam = obj.nam;
-    this.email=obj.email;
+    this.email = obj.email;
     this.pas = obj.pas;
     this.fixed = obj.fixed;
     this.deadline = obj.deadline;
@@ -37,19 +37,20 @@ class user {
     if (start > end) {
       this.err = this.err + 1;
       return;
+    } else {
+      this.fixed.forEach(element => {
+        if (element[0] < end && element[1] > start) {
+          this.err = this.err + 1;
+          return;
+        }
+      });
+      this.fixed.push([start, end, name, this.idfix]);
+      this.fixed.sort(function(a, b) {
+        return a[0] > b[0] ? 1 : -1;
+      });
+      this.idfix = this.idfix + 1;
+      this.sceduler();
     }
-    this.fixed.forEach(element => {
-      if (element[0] < end && element[1] > start) {
-        this.err = this.err + 1;
-        return;
-      }
-    });
-    this.fixed.push([start, end, name, this.idfix]);
-    this.fixed.sort(function (a, b) {
-      return a[0] > b[0] ? 1 : -1;
-    });
-    this.idfix = this.idfix + 1;
-    this.sceduler();
   }
 
   adddead(deadline, hour, name) {
@@ -58,7 +59,7 @@ class user {
       return;
     }
     this.deadline.push([deadline, hour, name, this.iddead]);
-    this.deadline.sort(function (a, b) {
+    this.deadline.sort(function(a, b) {
       return a[0] > b[0] ? 1 : -1;
     });
     this.iddead = this.iddead + 1;
@@ -139,114 +140,162 @@ class user {
 }
 
 function checkLogin(userName, pass) {
-  return new Promise(function (resolve, reject) {
-    MongoClient.connect(url, function (err, db) {
-      if (err) throw err;
-      var dbo = db.db("users");
-      var query = {
-        nam: userName,
-        pas: crypto.createHash("md5").update(pass).digest("hex")
-      };
-      console.log(query.pas);
-      dbo.collection("users").find(query).toArray(function (err, result) {
+  return new Promise(function(resolve, reject) {
+    MongoClient.connect(
+      url,
+      function(err, db) {
         if (err) throw err;
-        console.log("Result" + result.length);
-        console.log(result);
-        if (result.length != 0) {
-          console.log("Resolved");
-          u1 = new user("temp","temp");
-          u1.load(result[0]);
-          resolve("Hi");
-        } else {
-          console.log("Unresolved");
-          reject(0);
-        }
-        db.close();
-      });
-    });
+        var dbo = db.db("users");
+        var query = {
+          nam: userName,
+          pas: crypto
+            .createHash("md5")
+            .update(pass)
+            .digest("hex")
+        };
+        console.log(query.pas);
+        dbo
+          .collection("users")
+          .find(query)
+          .toArray(function(err, result) {
+            if (err) throw err;
+            console.log("Result" + result.length);
+            console.log(result);
+            if (result.length != 0) {
+              console.log("Resolved");
+              u1 = new user("temp", "temp");
+              u1.load(result[0]);
+              resolve("Hi");
+            } else {
+              console.log("Unresolved");
+              reject(0);
+            }
+            db.close();
+          });
+      }
+    );
   });
 }
 let u1;
 let users = [];
 for (i = 0; i < 10; i++) {
-  users.push(new user("akash", "password","aka@iitk.ac.in"));
+  users.push(new user("akash", "password", "aka@iitk.ac.in"));
 }
 /* GET users listing. */
-router.get("/", function (req, res, next) {
+router.get("/", function(req, res, next) {
   if (req.session.user == undefined || req.session.pass == undefined) {
-    res.render('index');
+    res.render("index");
     return;
   }
-  checkLogin(req.session.user, req.session.pass).then(function (temp) {
-    console.log("Resolve");
-    res.send(JSON.stringify(u1));
-  }).catch(function () {
-    console.log("Unresolved");
-    res.render('index');
-    return;
-  });
-
+  checkLogin(req.session.user, req.session.pass)
+    .then(function(temp) {
+      console.log("Resolve");
+      res.send(JSON.stringify(u1));
+    })
+    .catch(function() {
+      console.log("Unresolved");
+      res.render("index");
+      return;
+    });
 });
 
-router.post("/", function (req, res, next) {
+router.post("/", function(req, res, next) {
   if (req.session.user == undefined || req.session.pass == undefined) {
-    res.render('index');
+    res.render("index");
     return;
   }
-  if (req.body.start && req.body.end) {
-    u1.addfixed(
-      new Date(req.body.start),
-      new Date(req.body.end),
-      req.body.name
-    );
-  }
-  if (req.body.deadline != "" && req.body.hours) {
-    u1.adddead(new Date(req.body.deadline), req.body.hours, req.body.name);
-  }
-  res.send(JSON.stringify(u1));
+  checkLogin(req.session.user, req.session.pass)
+    .then(function(temp) {
+      if (req.body.start && req.body.end) {
+        u1.addfixed(
+          new Date(req.body.start),
+          new Date(req.body.end),
+          req.body.name
+        );
+      }
+      if (req.body.deadline != "" && req.body.hours) {
+        u1.adddead(new Date(req.body.deadline), req.body.hours, req.body.name);
+      }
+      MongoClient.connect(
+        url,
+        function(err, db) {
+          if (err) throw err;
+          var dbo = db.db("users");
+          var query = {
+            nam: u1.nam,
+            pas: u1.pas
+          };
+          let newval = {
+            $set: JSON.parse(JSON.stringify(u1))
+          };
+          console.log(query.pas);
+          dbo.collection("users").updateOne(query, newval, function(err, res) {
+            if (err) throw err;
+            console.log("1 document updated");
+            db.close();
+          });
+        }
+      );
+      res.send(JSON.stringify(u1));
+    })
+    .catch(function() {
+      console.log("Unresolved");
+      res.render("index");
+      return;
+    });
 });
 
-router.post('/signup', function (req, res, next) {
+router.post("/signup", function(req, res, next) {
   //In this we are assigning email to sess.email variable.
   //email comes from HTML page.
-  let userexits = new Promise(function (resolve, rej) {
-    MongoClient.connect(url, function (err, db) {
-      if (err) throw err;
-      var dbo = db.db("users");
-      var query = {
-        nam: req.body.user
-      };
-      dbo.collection("users").find(query).toArray(function (err, result) {
+  let userexits = new Promise(function(resolve, rej) {
+    MongoClient.connect(
+      url,
+      function(err, db) {
         if (err) throw err;
-        console.log("Result" + result.length);
-        if (result.length != 0) {
-          rej(1);
-        } else {
-          resolve(0);
+        var dbo = db.db("users");
+        var query = {
+          nam: req.body.user
+        };
+        dbo
+          .collection("users")
+          .find(query)
+          .toArray(function(err, result) {
+            if (err) throw err;
+            console.log("Result" + result.length);
+            if (result.length != 0) {
+              rej(1);
+            } else {
+              resolve(0);
+            }
+            db.close();
+          });
+      }
+    );
+  });
+
+  userexits
+    .then(function() {
+      MongoClient.connect(
+        url,
+        function(err, db) {
+          if (err) throw err;
+          var dbo = db.db("users");
+          u1 = new user(req.body.user, req.body.pass);
+          console.log(JSON.stringify(u1));
+          dbo.collection("users").insertOne(JSON.parse(JSON.stringify(u1)));
+          if (err) throw err;
         }
-        db.close();
-      });
+      );
+
+      sess = req.session;
+      sess.pass = req.body.pass;
+      sess.user = req.body.user;
+      res.redirect("/users");
+    })
+    .catch(function() {
+      res.redirect("/signup");
     });
-  });
-
-  userexits.then(function () {
-    MongoClient.connect(url, function (err, db) {
-      if (err) throw err;
-      var dbo = db.db("users");
-      u1 = new user(req.body.user, req.body.pass);
-      console.log(JSON.stringify(u1));
-      dbo.collection("users").insertOne(JSON.parse(JSON.stringify(u1)));
-      if (err) throw err;
-    });
-
-    sess = req.session;
-    sess.pass = req.body.pass;
-    sess.user = req.body.user;
-    res.redirect("/users");
-  }).catch(function () {
-    res.redirect("/signup");
-  });
-
 });
 setInterval(function scedule() {
   for (i = 0; i < users.length; i++) {

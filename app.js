@@ -57,7 +57,7 @@ app.get('/logout',function(req,res){
   req.session.destroy();
 //In this we are assigning email to sess.email variable.
 //email comes from HTML page.
-  res.redirect('/index');
+  res.redirect('/');
 });
 
 app.get('*', function(req, res) { res.render('404', { title: 'Page Not Found'}); });
