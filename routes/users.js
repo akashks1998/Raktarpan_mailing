@@ -1,10 +1,35 @@
-var express = require("express");
-var MongoClient = require("mongodb").MongoClient;
-var url = "mongodb://localhost:27017/";
-let id = 0;
-var crypto = require("crypto");
+let express = require("express");
+let MongoClient = require("mongodb").MongoClient;
+let url = "mongodb://localhost:27017/";
+let crypto = require("crypto");
 
-var router = express.Router();
+
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'akashkumarsingh214@gmail.com',
+    pass: 'xxxxxxxxx'
+  }
+});
+
+var mailOptions = {
+  from: 'akashkumarsingh214@gmail.com',
+  to: 'gosea7son@gmail.com',
+  subject: 'Sending Email using Node.js',
+  text: 'That was easy!'
+};
+
+transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
+});
+
+let router = express.Router();
 class user {
   constructor(nam, pas, email) {
     this.nam = nam;
@@ -145,8 +170,8 @@ function checkLogin(userName, pass) {
       url,
       function(err, db) {
         if (err) throw err;
-        var dbo = db.db("users");
-        var query = {
+        let dbo = db.db("users");
+        let query = {
           nam: userName,
           pas: crypto
             .createHash("md5")
@@ -220,8 +245,8 @@ router.post("/", function(req, res, next) {
         url,
         function(err, db) {
           if (err) throw err;
-          var dbo = db.db("users");
-          var query = {
+          let dbo = db.db("users");
+          let query = {
             nam: u1.nam,
             pas: u1.pas
           };
@@ -246,15 +271,15 @@ router.post("/", function(req, res, next) {
 });
 
 router.post("/signup", function(req, res, next) {
-  //In this we are assigning email to sess.email variable.
+  //In this we are assigning email to sess.email letiable.
   //email comes from HTML page.
   let userexits = new Promise(function(resolve, rej) {
     MongoClient.connect(
       url,
       function(err, db) {
         if (err) throw err;
-        var dbo = db.db("users");
-        var query = {
+        let dbo = db.db("users");
+        let query = {
           nam: req.body.user
         };
         dbo
@@ -280,7 +305,7 @@ router.post("/signup", function(req, res, next) {
         url,
         function(err, db) {
           if (err) throw err;
-          var dbo = db.db("users");
+          let dbo = db.db("users");
           u1 = new user(req.body.user, req.body.pass);
           console.log(JSON.stringify(u1));
           dbo.collection("users").insertOne(JSON.parse(JSON.stringify(u1)));
@@ -298,8 +323,8 @@ router.post("/signup", function(req, res, next) {
     });
 });
 setInterval(function scedule() {
-  for (i = 0; i < users.length; i++) {
-    users.scedule();
-  }
+  let update=new Promise(function(resolve,reject){
+
+  });
 }, 3600000);
 module.exports = router;

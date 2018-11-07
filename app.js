@@ -1,17 +1,17 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var session = require('express-session');
+let createError = require('http-errors');
+let express = require('express');
+let path = require('path');
+let bodyParser = require('body-parser');
+let cookieParser = require('cookie-parser');
+let logger = require('morgan');
+let session = require('express-session');
 let sess;
 
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+let indexRouter = require('./routes/index');
+let usersRouter = require('./routes/users');
 
-var app = express();
+let app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -36,7 +36,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.post('/login',function(req,res){
   sess = req.session;
-//In this we are assigning email to sess.email variable.
+//In this we are assigning email to sess.email letiable.
 //email comes from HTML page.
   
   sess.pass=req.body.pass;
@@ -45,7 +45,7 @@ app.post('/login',function(req,res){
 });
 app.post('/logout',function(req,res){
   req.session.destroy();
-//In this we are assigning email to sess.email variable.
+//In this we are assigning email to sess.email letiable.
 //email comes from HTML page.
   res.redirect('/users');
 });
@@ -55,7 +55,7 @@ app.get('/signup',function(req,res,next){
 });
 app.get('/logout',function(req,res){
   req.session.destroy();
-//In this we are assigning email to sess.email variable.
+//In this we are assigning email to sess.email letiable.
 //email comes from HTML page.
   res.redirect('/');
 });
