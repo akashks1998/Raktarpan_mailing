@@ -1,17 +1,19 @@
 var express = require("express");
-
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
 let id = 0;
 var crypto = require("crypto");
 
 var router = express.Router();
 class user {
-  constructor(nam, pas) {
+  constructor(nam, pas,email) {
     this.nam = nam;
     this.pas = crypto
       .createHash("md5")
       .update(pas)
       .digest("hex");
     this.fixed = [];
+    this.email=email;
     this.deadline = [];
     this.idfix = 0;
     this.iddead = 0;
@@ -19,7 +21,18 @@ class user {
     this.err = 0;
     this.hour = 0;
   }
-
+  load(obj) {
+    this.nam = obj.nam;
+    this.email=obj.email;
+    this.pas = obj.pas;
+    this.fixed = obj.fixed;
+    this.deadline = obj.deadline;
+    this.idfix = obj.idfix;
+    this.iddead = obj.iddead;
+    this.scedule = obj.scedule;
+    this.err = obj.err;
+    this.hour = obj.hour;
+  }
   addfixed(start, end, name) {
     if (start > end) {
       this.err = this.err + 1;
@@ -32,7 +45,7 @@ class user {
       }
     });
     this.fixed.push([start, end, name, this.idfix]);
-    this.fixed.sort(function(a, b) {
+    this.fixed.sort(function (a, b) {
       return a[0] > b[0] ? 1 : -1;
     });
     this.idfix = this.idfix + 1;
@@ -45,7 +58,7 @@ class user {
       return;
     }
     this.deadline.push([deadline, hour, name, this.iddead]);
-    this.deadline.sort(function(a, b) {
+    this.deadline.sort(function (a, b) {
       return a[0] > b[0] ? 1 : -1;
     });
     this.iddead = this.iddead + 1;
@@ -124,23 +137,59 @@ class user {
     }
   }
 }
-let u1 = new user("akash", "password");
+
+function checkLogin(userName, pass) {
+  return new Promise(function (resolve, reject) {
+    MongoClient.connect(url, function (err, db) {
+      if (err) throw err;
+      var dbo = db.db("users");
+      var query = {
+        nam: userName,
+        pas: crypto.createHash("md5").update(pass).digest("hex")
+      };
+      console.log(query.pas);
+      dbo.collection("users").find(query).toArray(function (err, result) {
+        if (err) throw err;
+        console.log("Result" + result.length);
+        console.log(result);
+        if (result.length != 0) {
+          console.log("Resolved");
+          u1 = new user("temp","temp");
+          u1.load(result[0]);
+          resolve("Hi");
+        } else {
+          console.log("Unresolved");
+          reject(0);
+        }
+        db.close();
+      });
+    });
+  });
+}
+let u1;
 let users = [];
 for (i = 0; i < 10; i++) {
-  users.push(new user("akash", "password"));
+  users.push(new user("akash", "password","aka@iitk.ac.in"));
 }
 /* GET users listing. */
-router.get("/", function(req, res, next) {
-  if(req.session.user==undefined||req.session.pass==undefined){
+router.get("/", function (req, res, next) {
+  if (req.session.user == undefined || req.session.pass == undefined) {
     res.render('index');
     return;
   }
-  console.log(req.session.user);
-  res.send(JSON.stringify(u1));
+  checkLogin(req.session.user, req.session.pass).then(function (temp) {
+    console.log("Resolve");
+    res.send(JSON.stringify(u1));
+  }).catch(function () {
+    console.log("Unresolved");
+    res.render('index');
+    return;
+  });
+
 });
 
-router.post("/", function(req, res, next) {
-  if(req.session.user==undefined||req.session.pass==undefined){
+router.post("/", function (req, res, next) {
+  if (req.session.user == undefined || req.session.pass == undefined) {
     res.render('index');
     return;
   }

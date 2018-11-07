@@ -7,17 +7,7 @@ var logger = require('morgan');
 var session = require('express-session');
 let sess;
 
-var MongoClient = require("mongodb").MongoClient;
-var url = "mongodb://localhost:27017/mydb";
-let id = 0;
-MongoClient.connect(
-  url,
-  function(err, db) {
-    if (err) throw err;
-    console.log("Database created!");
-    db.close();
-  }
-);
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -48,6 +38,7 @@ app.post('/login',function(req,res){
   sess = req.session;
 //In this we are assigning email to sess.email variable.
 //email comes from HTML page.
+  
   sess.pass=req.body.pass;
   sess.user=req.body.user;
   res.redirect('/users');
@@ -58,12 +49,17 @@ app.post('/logout',function(req,res){
 //email comes from HTML page.
   res.redirect('/users');
 });
+app.get('/signup',function(req,res,next){
+  req.session.destroy();
+  res.render("signup");
+});
 app.get('/logout',function(req,res){
   req.session.destroy();
 //In this we are assigning email to sess.email variable.
 //email comes from HTML page.
   res.redirect('/index');
 });
+
 app.get('*', function(req, res) { res.render('404', { title: 'Page Not Found'}); });
 
 // catch 404 and forward to error handler
