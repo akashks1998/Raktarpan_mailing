@@ -157,6 +157,48 @@ router.post("/", function(req, res, next) {
   res.send(JSON.stringify(u1));
 });
 
+router.post('/signup', function (req, res, next) {
+  //In this we are assigning email to sess.email variable.
+  //email comes from HTML page.
+  let userexits = new Promise(function (resolve, rej) {
+    MongoClient.connect(url, function (err, db) {
+      if (err) throw err;
+      var dbo = db.db("users");
+      var query = {
+        nam: req.body.user
+      };
+      dbo.collection("users").find(query).toArray(function (err, result) {
+        if (err) throw err;
+        console.log("Result" + result.length);
+        if (result.length != 0) {
+          rej(1);
+        } else {
+          resolve(0);
+        }
+        db.close();
+      });
+    });
+  });
+
+  userexits.then(function () {
+    MongoClient.connect(url, function (err, db) {
+      if (err) throw err;
+      var dbo = db.db("users");
+      u1 = new user(req.body.user, req.body.pass);
+      console.log(JSON.stringify(u1));
+      dbo.collection("users").insertOne(JSON.parse(JSON.stringify(u1)));
+      if (err) throw err;
+    });
+
+    sess = req.session;
+    sess.pass = req.body.pass;
+    sess.user = req.body.user;
+    res.redirect("/users");
+  }).catch(function () {
+    res.redirect("/signup");
+  });
+
+});
 setInterval(function scedule() {
   for (i = 0; i < users.length; i++) {
     users.scedule();
