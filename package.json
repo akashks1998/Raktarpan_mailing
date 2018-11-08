@@ -16,6 +16,7 @@
     "http-errors": "~1.6.2",
     "mongo": "^0.1.0",
     "morgan": "~1.9.0",
-    "nodemailer": "^4.6.8"
+    "nodemailer": "^4.6.8",
+    "randomstring": "^1.1.5"
   }
 }

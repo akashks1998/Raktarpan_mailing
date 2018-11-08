@@ -2,15 +2,15 @@ let express = require("express");
 let MongoClient = require("mongodb").MongoClient;
 let url = "mongodb://localhost:27017/";
 let crypto = require("crypto");
+let randomstring = require("randomstring");
 
+let nodemailer = require('nodemailer');
 
-var nodemailer = require('nodemailer');
-
-var transporter = nodemailer.createTransport({
+let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'akashkumarsingh214@gmail.com',
-    pass: 'xxxxxxxxxx'
+    pass: 'akashkumarsingh31'
   }
 });
 
@@ -18,13 +18,16 @@ var transporter = nodemailer.createTransport({
 
 let router = express.Router();
 class user {
-  constructor(nam, pas, email) {
+  constructor(nam, pas, email, verify, str) {
+
     this.nam = nam;
     this.pas = crypto
       .createHash("md5")
       .update(pas)
       .digest("hex");
     this.fixed = [];
+    this.verify = verify;
+    this.str = str;
     this.email = email;
     this.deadline = [];
     this.idfix = 0;
@@ -37,6 +40,8 @@ class user {
     this.nam = obj.nam;
     this.email = obj.email;
     this.pas = obj.pas;
+    this.verify = obj.verify;
+    this.str = obj.str;
     this.fixed = obj.fixed;
     this.deadline = obj.deadline;
     this.idfix = obj.idfix;
@@ -218,10 +223,6 @@ function checkLogin(userName, pass) {
   });
 }
 let u1;
-let users = [];
-for (i = 0; i < 10; i++) {
-  users.push(new user("akash", "password", "aka@iitk.ac.in"));
-}
 /* GET users listing. */
 router.get("/", function (req, res, next) {
   if (req.session.user == undefined || req.session.pass == undefined) {
@@ -231,7 +232,11 @@ router.get("/", function (req, res, next) {
   checkLogin(req.session.user, req.session.pass)
     .then(function (temp) {
       console.log("Resolve");
-      res.send(JSON.stringify(u1));
+      if (u1.verify == 1) {
+        res.send(JSON.stringify(u1));
+      } else {
+        res.render('verification');
+      }
     })
     .catch(function () {
       console.log("Unresolved");
@@ -247,19 +252,24 @@ router.post("/", function (req, res, next) {
   }
   checkLogin(req.session.user, req.session.pass)
     .then(function (temp) {
-      if (req.body.start && req.body.end) {
-        u1.addfixed(
-          new Date(req.body.start),
-          new Date(req.body.end),
-          req.body.name
-        );
+      if (u1.verify == 1) {
+        if (req.body.start && req.body.end) {
+          u1.addfixed(
+            new Date(req.body.start),
+            new Date(req.body.end),
+            req.body.name
+          );
+        }
+        if (req.body.deadline != "" && req.body.hours) {
+          u1.adddead(new Date(req.body.deadline), req.body.hours, req.body.name);
+        }
+        updateUser(u1).then(function () {
+          res.send(JSON.stringify(u1));
+        });
+
+      } else {
+        res.render('verification');
       }
-      if (req.body.deadline != "" && req.body.hours) {
-        u1.adddead(new Date(req.body.deadline), req.body.hours, req.body.name);
-      }
-      updateUser(u1).then(function () {
-        res.send(JSON.stringify(u1));
-      });
     })
     .catch(function () {
       console.log("Unresolved");
@@ -267,7 +277,28 @@ router.post("/", function (req, res, next) {
       return;
     });
 });
-
+router.post('/verify',function(req,res,next){
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(req.session.user, req.session.pass)
+    .then(function (temp) {
+      console.log("Resolve");
+      if (u1.str == req.body.code&& u1.verify==0) {
+        u1.verify=1;
+        updateUser(u1);
+        res.redirect("/users");
+      } else {
+        res.render('verification');
+      }
+    })
+    .catch(function () {
+      console.log("Unresolved");
+      res.render("index");
+      return;
+    });
+});
 router.post("/signup", function (req, res, next) {
   //In this we are assigning email to sess.email letiable.
   //email comes from HTML page.
@@ -304,7 +335,23 @@ router.post("/signup", function (req, res, next) {
         function (err, db) {
           if (err) throw err;
           let dbo = db.db("users");
-          u1 = new user(req.body.user, req.body.pass,req.body.email);
+          let temp=randomstring.generate(7);
+          u1 = new user(req.body.user, req.body.pass, req.body.email,0,temp);
+          let mailOptions = {
+            from: 'akashkumarsingh214@gmail.com',
+            to: req.body.email,
+            subject: 'Conformation mail by Kronos',
+            text: 'Conformation code is ' + temp
+          };
+
+          transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
+
           console.log(JSON.stringify(u1));
           dbo.collection("users").insertOne(JSON.parse(JSON.stringify(u1)));
           if (err) throw err;
@@ -320,7 +367,7 @@ router.post("/signup", function (req, res, next) {
       res.redirect("/signup");
     });
 });
-setInterval(function scedule() {
+setInterval(function () {
   let update = new Promise(function (resolve, reject) {
     MongoClient.connect(
       url,
@@ -340,7 +387,7 @@ setInterval(function scedule() {
               temp.sceduler();
               updateUser(temp).then(
                 function () {
-                  var mailOptions = {
+                  let mailOptions = {
                     from: 'akashkumarsingh214@gmail.com',
                     to: temp.email,
                     subject: 'Scheduler',

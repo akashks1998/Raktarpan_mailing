@@ -5,7 +5,7 @@ Backend for Kronos.
 ``` json
 {
 "name":"Aaa",
-"username": "user1"
+"username": "user1",
 "email":"aaa@gmail.com",
 "password":"password"
 }
