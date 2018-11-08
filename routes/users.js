@@ -9,8 +9,8 @@ let nodemailer = require('nodemailer');
 let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'akashkumarsingh214@gmail.com',
-    pass: 'akashkumarsingh31'
+    user: 'kronoskumar252@gmail.com',
+    pass: 'kronos252'
   }
 });
 
@@ -35,6 +35,7 @@ class user {
     this.scedule = [];
     this.err = 0;
     this.hour = 0;
+    this.contributers = [];
   }
   load(obj) {
     this.nam = obj.nam;
@@ -49,6 +50,7 @@ class user {
     this.scedule = obj.scedule;
     this.err = obj.err;
     this.hour = obj.hour;
+    this.contributers = obj.contributers;
   }
   addfixed(start, end, name) {
     if (start > end) {
@@ -69,7 +71,14 @@ class user {
       this.sceduler();
     }
   }
-
+  addContributer(user) {
+    this.contributers.push(user);
+  }
+  removeContributer(user) {
+    if (this.contributers.indexOf(user) > -1) {
+      this.contributers.splice(this.contributers.indexOf(user), 1);
+    }
+  }
   adddead(deadline, hour, name) {
     if (hour < 0) {
       this.err++;
@@ -102,7 +111,7 @@ class user {
     console.log(this.x.getHours());
 
     if (this.x.getHours() < 7) {
-      this.scedule = [0, 0, "Sleep"];
+      this.scedule = [0, 0, "Sleep", 0];
       return;
     }
     if (
@@ -152,6 +161,8 @@ class user {
       this.fixed.shift();
       this.sceduler();
       return;
+    } else {
+      this.scedule = [0, 0, "Free", 0];
     }
   }
 }
@@ -193,10 +204,7 @@ function checkLogin(userName, pass) {
         let dbo = db.db("users");
         let query = {
           nam: userName,
-          pas: crypto
-            .createHash("md5")
-            .update(pass)
-            .digest("hex")
+          pas: pass
         };
         console.log(query.pas);
         dbo
@@ -204,9 +212,8 @@ function checkLogin(userName, pass) {
           .find(query)
           .toArray(function (err, result) {
             if (err) throw err;
-            console.log("Result" + result.length);
-            console.log(result);
-            if (result.length != 0) {
+            console.log("Result" + result.length+result[0].nam);
+            if (result.length == 1) {
               console.log("Resolved");
               u1 = new user("temp", "temp");
               u1.load(result[0]);
@@ -229,7 +236,7 @@ router.get("/", function (req, res, next) {
     res.render("index");
     return;
   }
-  checkLogin(req.session.user, req.session.pass)
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex"))
     .then(function (temp) {
       console.log("Resolve");
       if (u1.verify == 1) {
@@ -244,13 +251,198 @@ router.get("/", function (req, res, next) {
       return;
     });
 });
+router.post('/addcontributer',function(req,res){
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function(){
+    u1.addContributer(req.body.contributer);
+    updateUser(u1);
+    res.redirect('/users');
+  });
+});
+router.post('/contributer/:id/deadline',
+  function (req, res, next) {
+    let id=req.params.id;
+    if (req.session.user == undefined || req.session.pass == undefined) {
+      res.render("index");
+      return;
+    }
+    checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function (tem) {
+        if (u1.verify == 1) {
+          let temp;
+          let sour = new Promise(function (resolve, reject) {
+            MongoClient.connect(
+              url,
+              function (err, db) {
+                if (err) throw err;
+                let dbo = db.db("users");
+                let query = {
+                  nam: id
+                };
+                dbo
+                  .collection("users")
+                  .find(query)
+                  .toArray(function (err, result) {
+                    if (err) throw err;
+                    console.log("Result" + result.length);
+                    console.log(result);
+                    if (result.length != 0) {
+                      console.log("Resolved");
+                      temp = new user("temp", "temp");
+                      temp.load(result[0]);
+                      resolve("Hi");
+                    } else {
+                      console.log("Unresolved");
+                      reject(0);
+                    }
 
+                    db.close();
+                  });
+              }
+            );
+          });
+          sour.then(function () {
+            console.log("Contributers index"+temp.contributers.indexOf(u1.nam));
+            if (temp.contributers.indexOf(u1.nam) > -1) {
+              if (req.body.deadline != "" && req.body.hours) {
+                temp.adddead(new Date(req.body.deadline), req.body.hours, req.body.name);
+                updateUser(temp).then(
+                  function () {
+                    let mailOptions = {
+                      from: 'kronoskumar252@gmail.com',
+                      to: temp.email,
+                      subject: 'New task added',
+                      text: 'User ' + u1.nam + ' added a task in your calender. The task is ' + req.body.name
+                    };
+                    transporter.sendMail(mailOptions, function (error, info) {
+                      if (error) {
+                        console.log(error);
+                      } else {
+                        console.log('Email sent: ' + info.response);
+                      }
+                    });
+                    res.send(JSON.stringify(temp));
+                  }
+                ).catch(function () {
+                  console.log("Sorry");
+                });
+              }
+            } else {
+              res.send("Sorry, but you are not a contributer");
+            }
+          }).catch(function () {
+            res.send("Sorry, some server side error");
+          });
+        } else {
+          res.render('verification');
+        }
+      })
+      .catch(function () {
+        console.log("Unresolved");
+        res.render("index");
+        return;
+      });
+  }
+);
+router.post('/contributer/:id/fixed',
+  function (req, res, next) {
+    if (req.session.user == undefined || req.session.pass == undefined) {
+      res.render("index");
+      return;
+    }
+    let id=req.params.id;
+
+    checkLogin(u1.nam, u1.pass)
+      .then(function (tem) {
+        if (u1.verify == 1) {
+          let temp;
+          let sour = new Promise(function (resolve, reject) {
+            MongoClient.connect(
+              url,
+              function (err, db) {
+                if (err) throw err;
+                let dbo = db.db("users");
+                let query = {
+                  nam: id
+                };
+                dbo
+                  .collection("users")
+                  .find(query)
+                  .toArray(function (err, result) {
+                    if (err) throw err;
+                    console.log("Result" + result.length);
+                    console.log(result);
+                    if (result.length != 0) {
+                      console.log("Resolved");
+                      temp = new user("temp", "temp");
+                      temp.load(result[0]);
+                      resolve("Hi");
+                    } else {
+                      console.log("Unresolved");
+                      reject(0);
+                    }
+
+                    db.close();
+                  });
+              }
+            );
+          });
+          sour.then(function () {
+            temp.contributers.indexOf(u1.nam)
+            if (temp.contributers.indexOf(u1.nam) > -1) {
+              if (req.body.start && req.body.end) {
+                u1.addfixed(
+                  new Date(req.body.start),
+                  new Date(req.body.end),
+                  req.body.name
+                );
+                updateUser(temp).then(
+                  function () {
+                    let mailOptions = {
+                      from: 'kronoskumar252@gmail.com',
+                      to: temp.email,
+                      subject: 'New task added',
+                      text: 'User ' + u1.nam + ' added a task in your calender. The task is ' + req.body.name
+                    };
+                    transporter.sendMail(mailOptions, function (error, info) {
+                      if (error) {
+                        console.log(error);
+                      } else {
+                        console.log('Email sent: ' + info.response);
+                      }
+                    });
+                    res.send(JSON.stringify(temp));
+                  }
+                ).catch(function () {
+                  console.log("Sorry");
+                });
+              }
+            } else {
+              res.send("Sorry, but you are not a contributer");
+            }
+
+          }).catch(function () {
+            res.send("Sorry, some server side error");
+          });
+        } else {
+          res.render('verification');
+        }
+      })
+      .catch(function () {
+        console.log("Unresolved");
+        res.render("index");
+        return;
+      });
+  }
+);
 router.post("/", function (req, res, next) {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
     return;
   }
-  checkLogin(req.session.user, req.session.pass)
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex"))
     .then(function (temp) {
       if (u1.verify == 1) {
         if (req.body.start && req.body.end) {
@@ -277,16 +469,16 @@ router.post("/", function (req, res, next) {
       return;
     });
 });
-router.post('/verify',function(req,res,next){
+router.post('/verify', function (req, res, next) {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
     return;
   }
-  checkLogin(req.session.user, req.session.pass)
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex"))
     .then(function (temp) {
       console.log("Resolve");
-      if (u1.str == req.body.code&& u1.verify==0) {
-        u1.verify=1;
+      if (u1.str == req.body.code && u1.verify == 0) {
+        u1.verify = 1;
         updateUser(u1);
         res.redirect("/users");
       } else {
@@ -335,10 +527,10 @@ router.post("/signup", function (req, res, next) {
         function (err, db) {
           if (err) throw err;
           let dbo = db.db("users");
-          let temp=randomstring.generate(7);
-          u1 = new user(req.body.user, req.body.pass, req.body.email,0,temp);
+          let temp = randomstring.generate(7);
+          u1 = new user(req.body.user, req.body.pass, req.body.email, 0, temp);
           let mailOptions = {
-            from: 'akashkumarsingh214@gmail.com',
+            from: 'kronoskumar252@gmail.com',
             to: req.body.email,
             subject: 'Conformation mail by Kronos',
             text: 'Conformation code is ' + temp
@@ -388,7 +580,7 @@ setInterval(function () {
               updateUser(temp).then(
                 function () {
                   let mailOptions = {
-                    from: 'akashkumarsingh214@gmail.com',
+                    from: 'kronoskumar252@gmail.com',
                     to: temp.email,
                     subject: 'Scheduler',
                     text: 'Current task is ' + temp.scedule[2]

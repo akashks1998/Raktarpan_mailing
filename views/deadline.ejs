@@ -5,7 +5,7 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <form method="POST" action="/users">
+    <form method="POST" action='<%= id %>'>
       <input type="datetime-local" value='<%= start %>' placeholder="Deadline" name="deadline"><br>
       <input type="number" value="1" placeholder="Hours" name="hours"><br>
       <input type="text" placeholder="Name" name="name"><br>
