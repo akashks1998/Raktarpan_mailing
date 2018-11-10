@@ -38,6 +38,7 @@ class user {
     this.err = 0;
     this.hour = 0;
     this.contributers = [];
+    this.contribute = [];
   }
   load(obj) {
     this.nam = obj.nam;
@@ -55,6 +56,8 @@ class user {
     this.err = obj.err;
     this.hour = obj.hour;
     this.contributers = obj.contributers;
+    this.contribute = obj.contribute;
+
   }
   addfixed(start, end, name) {
     if (start > end) {
@@ -264,9 +267,44 @@ router.post('/addcontributer', function (req, res) {
     return;
   }
   checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function () {
-    u1.addContributer(req.body.contributer);
-    updateUser(u1);
-    res.redirect('/users');
+    let temp;
+    let userexits = new Promise(function (resolve, rej) {
+      MongoClient.connect(
+        url,
+        function (err, db) {
+          if (err) throw err;
+          let dbo = db.db("users");
+          let query = {
+            nam: req.body.contributer
+          };
+          dbo
+            .collection("users")
+            .find(query)
+            .toArray(function (err, result) {
+              if (err) throw err;
+              console.log("Result" + result.length);
+              if (result.length == 1) {
+                temp = new user("temp", "temp");
+                temp.load(result[0]);
+                resolve(1);
+              } else {
+                rej(0);
+              }
+              db.close();
+            });
+        }
+      );
+    });
+    userexits.then(() => {
+      u1.addContributer(req.body.contributer);
+      updateUser(u1);
+      temp.contribute.push(u1.nam);
+      updateUser(temp);
+      res.redirect('/users');
+    }).catch(() => {
+      res.send("Sorry, User doesn't exist");
+    });
+
   });
 });
 router.post('/forget', function (req, res) {
@@ -311,7 +349,7 @@ router.post('/forget', function (req, res) {
       if (error) {
         console.log(error);
         res.render('/forget');
-        
+
       } else {
         console.log('Email sent: ' + info.response);
         updateUser(temp);
@@ -326,7 +364,7 @@ router.post('/forget', function (req, res) {
 
 router.post('/reset', function (req, res) {
   let temp;
-  let ps=crypto.createHash("md5").update(req.body.pass).digest("hex");
+  let ps = crypto.createHash("md5").update(req.body.pass).digest("hex");
   let userexits = new Promise(function (resolve, rej) {
     MongoClient.connect(
       url,
@@ -371,25 +409,25 @@ router.post('/reset', function (req, res) {
           console.log('Email sent: ' + info.response);
         }
       });
-      let x=new Promise(function(resolve,rej){
+      let x = new Promise(function (resolve, rej) {
         temp.pas = ps;
         temp.reset = 0;
-        console.log("Password is "+crypto.createHash("md5").update(req.body.pass).digest("hex"));
+        console.log("Password is " + crypto.createHash("md5").update(req.body.pass).digest("hex"));
         resolve();
       });
-      x.then(()=>{
+      x.then(() => {
         updateUser(temp);
         res.redirect('/users');
         return;
-      }).catch(()=>{
+      }).catch(() => {
         res.send("Sorry error bro");
       });
-      
-    }else{
+
+    } else {
       res.redirect('/reset');
     }
-    
-  }).catch(()=>{
+
+  }).catch(() => {
     res.send("User does not exist or some server side error");
   });
 });

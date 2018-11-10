@@ -44,6 +44,9 @@ router.get('/addcontributer', function(req, res, next) {
  
   res.render('addcontributer');
 });
+router.get('/home', function(req, res, next) {
+    res.render('homepage');
+});
 module.exports = router;
 router.get('/contribute/:id/deadline', function(req, res, next) {
   let id=req.params.id;
