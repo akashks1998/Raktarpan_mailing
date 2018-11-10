@@ -299,32 +299,27 @@ router.post('/forget', function (req, res) {
     );
   });
   userexits.then(function () {
-    let mailer = new Promise(function (resolve, rej) {
-      let tmp = randomstring.generate(7);
-      let mailOptions = {
-        from: 'kronoskumar252@gmail.com',
-        to: temp.email,
-        subject: 'Conformation mail by Kronos',
-        text: 'Conformation code is ' + tmp
-      };
+    let tmp = randomstring.generate(7);
+    let mailOptions = {
+      from: 'kronoskumar252@gmail.com',
+      to: temp.email,
+      subject: 'Conformation mail by Kronos',
+      text: 'Conformation code is ' + tmp
+    };
 
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          temp.reset(tmp);
-          console.log('Email sent: ' + info.response);
-        }
-      });
-
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+        res.render('forget');
+      } else {
+        temp.reset(tmp);
+        console.log('Email sent: ' + info.response);
+        updateUser(temp);
+        res.render('reset');
+      }
     });
-    mailer.then(function () {
-      updateUser(temp);
-      res.redirect('/reset');
-    });
-  }).catch(function () {
-    res.redirect('/forget');
   });
+
 });
 
 router.post('/reset', function (req, res) {
@@ -356,14 +351,14 @@ router.post('/reset', function (req, res) {
       }
     );
   });
+
   userexits.then(function () {
-    if(temp.reset==1&&temp.resetcode==req.body.code){
-    let mailer = new Promise(function (resolve, rej) {
+    if (temp.reset == 1 && temp.resetcode == req.body.code) {
       let mailOptions = {
         from: 'kronoskumar252@gmail.com',
         to: temp.email,
         subject: 'Password reset by Kronos',
-        text: 'Dear '+temp.nam+',Your password is reset successfully.'
+        text: 'Dear ' + temp.nam + ',Your password is reset successfully.'
       };
 
       transporter.sendMail(mailOptions, function (error, info) {
@@ -374,20 +369,14 @@ router.post('/reset', function (req, res) {
           console.log('Email sent: ' + info.response);
         }
       });
-
-    });
-    mailer.then(function () {
-      temp.pass= crypto.createHash("md5").update(req.body.pass).digest("hex");
-      temp.reset=0;
+      temp.pass = crypto.createHash("md5").update(req.body.pass).digest("hex");
+      temp.reset = 0;
       updateUser(temp);
       res.redirect('/users');
-    });
-  }
-  }).catch(function () {
-    res.redirect('/reset');
+    }
+    res.render('reset');
   });
 });
-
 
 router.post('/contributer/:id/deadline',
   function (req, res, next) {
