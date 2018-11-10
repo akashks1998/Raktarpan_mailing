@@ -60,6 +60,8 @@ router.get('/contribute/:id/deadline', function(req, res, next) {
   res.render('deadline',{start:startt,id:'/users/contributer/'+id+'/deadline'});
 });
 router.get('/contribute/:id/fixed', function(req, res, next) {
+  let id=req.params.id;
+
   if(req.session.user==undefined||req.session.pass==undefined){
     res.render('index');
     return;

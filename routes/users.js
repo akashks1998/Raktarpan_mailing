@@ -261,6 +261,55 @@ router.get("/", function (req, res, next) {
       return;
     });
 });
+router.get("/change", function (req, res, next) {
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex"))
+    .then(function (temp) {
+      console.log("Resolve");
+      if (u1.verify == 1) {
+        if(req.body.email!=u1.email){
+          u1.verify=0;
+          let temp = randomstring.generate(7);
+          let mailOptions = {
+            from: 'kronoskumar252@gmail.com',
+            to: req.body.email,
+            subject: 'Conformation mail by Kronos',
+            text: 'Conformation code is ' + temp
+          };
+
+          transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log(error);
+              res.send("Sorry, server error");
+            } else {
+              u1.str=temp;
+              updateUser(u1);
+              res.redirect("/users");
+              console.log('Email sent: ' + info.response);
+              return;
+            }
+          });
+        }else{
+          res.render("/users/settings");
+        }
+        if(req.body.password!=''){
+          u1.pas=crypto.createHash("md5").update(req.body.password).digest("hex");
+          updateUser(u1);
+          res.render("/users/");
+        }
+      } else {
+        res.render('verification');
+      }
+    })
+    .catch(function () {
+      console.log("Unresolved");
+      res.render("index");
+      return;
+    });
+});
 router.post('/addcontributer', function (req, res) {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
@@ -305,6 +354,23 @@ router.post('/addcontributer', function (req, res) {
       res.send("Sorry, User doesn't exist");
     });
 
+  }) .catch(function () {
+    console.log("Unresolved");
+    res.render("index");
+    return;
+  });
+});
+router.get('/contribute',(req,res)=>{
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function () {
+    res.render('contribute',{contribute:u1.contribute});
+  }) .catch(function () {
+    console.log("Unresolved");
+    res.render("index");
+    return;
   });
 });
 router.post('/forget', function (req, res) {
