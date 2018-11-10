@@ -261,7 +261,7 @@ router.get("/", function (req, res, next) {
       return;
     });
 });
-router.get("/change", function (req, res, next) {
+router.post("/change", function (req, res, next) {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
     return;
@@ -286,6 +286,7 @@ router.get("/change", function (req, res, next) {
               res.send("Sorry, server error");
             } else {
               u1.str=temp;
+              u1.email=req.body.email;
               updateUser(u1);
               res.redirect("/users");
               console.log('Email sent: ' + info.response);
@@ -367,6 +368,19 @@ router.get('/contribute',(req,res)=>{
   }
   checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function () {
     res.render('contribute',{contribute:u1.contribute});
+  }) .catch(function () {
+    console.log("Unresolved");
+    res.render("index");
+    return;
+  });
+});
+router.get('/settings',(req,res)=>{
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then( ()=> {
+    res.render("settings",{user:u1.nam,email:u1.email});
   }) .catch(function () {
     console.log("Unresolved");
     res.render("index");
