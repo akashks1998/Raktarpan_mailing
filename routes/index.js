@@ -3,7 +3,11 @@ let router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index');
+  if(req.session.user==undefined||req.session.pass==undefined){
+    res.render('index');
+    return;
+  }
+  res.redirect('users');
 });
 router.get('/fixed', function(req, res, next) {
   if(req.session.user==undefined||req.session.pass==undefined){
