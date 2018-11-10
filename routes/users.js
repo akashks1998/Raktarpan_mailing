@@ -109,7 +109,7 @@ class user {
       }
     }
   }
-  reset(code) {
+  resetc(code) {
     this.reset = 1;
     this.resetcode = code;
   }
@@ -182,13 +182,13 @@ function updateUser(user) {
         if (err) throw err;
         let dbo = db.db("users");
         let query = {
-          nam: user.nam,
-          pas: user.pas
+          nam: user.nam
+          // pas: user.pas
         };
         let newval = {
           $set: JSON.parse(JSON.stringify(user))
         };
-        console.log(query.pas);
+        console.log(user.pas);
         dbo.collection("users").updateOne(query, newval, function (err, res) {
           if (err) throw err;
           console.log("1 document updated");
@@ -304,26 +304,29 @@ router.post('/forget', function (req, res) {
       from: 'kronoskumar252@gmail.com',
       to: temp.email,
       subject: 'Conformation mail by Kronos',
-      text: 'Conformation code is ' + tmp
+      text: 'Conformation code to reset password is ' + tmp
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
         console.log(error);
-        res.render('forget');
+        res.render('/forget');
+        
       } else {
-        temp.reset(tmp);
         console.log('Email sent: ' + info.response);
         updateUser(temp);
-        res.render('reset');
       }
     });
+    temp.resetc(tmp);
+    res.redirect('/reset');
+
   });
 
 });
 
 router.post('/reset', function (req, res) {
   let temp;
+  let ps=crypto.createHash("md5").update(req.body.pass).digest("hex");
   let userexits = new Promise(function (resolve, rej) {
     MongoClient.connect(
       url,
@@ -365,16 +368,29 @@ router.post('/reset', function (req, res) {
         if (error) {
           console.log(error);
         } else {
-          temp.reset(tmp);
           console.log('Email sent: ' + info.response);
         }
       });
-      temp.pass = crypto.createHash("md5").update(req.body.pass).digest("hex");
-      temp.reset = 0;
-      updateUser(temp);
-      res.redirect('/users');
+      let x=new Promise(function(resolve,rej){
+        temp.pas = ps;
+        temp.reset = 0;
+        console.log("Password is "+crypto.createHash("md5").update(req.body.pass).digest("hex"));
+        resolve();
+      });
+      x.then(()=>{
+        updateUser(temp);
+        res.redirect('/users');
+        return;
+      }).catch(()=>{
+        res.send("Sorry error bro");
+      });
+      
+    }else{
+      res.redirect('/reset');
     }
-    res.render('reset');
+    
+  }).catch(()=>{
+    res.send("User does not exist or some server side error");
   });
 });
 
