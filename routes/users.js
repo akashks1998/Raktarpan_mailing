@@ -250,7 +250,7 @@ router.get("/", function (req, res, next) {
     .then(function (temp) {
       console.log("Resolve");
       if (u1.verify == 1) {
-        res.send(JSON.stringify(u1));
+        res.redirect("/users/home");
       } else {
         res.render('verification');
       }
@@ -777,7 +777,7 @@ router.post("/", function (req, res, next) {
           u1.adddead(new Date(req.body.deadline), req.body.hours, req.body.name);
         }
         updateUser(u1).then(function () {
-          res.send(JSON.stringify(u1));
+          res.redirect("/users/home");
         });
 
       } else {
