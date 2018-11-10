@@ -30,7 +30,7 @@
         <a class="navbar-brand js-scroll-trigger" href="#page-top">
             <span class="d-block d-lg-none">Clarence Taylor</span>
             <span class="d-none d-lg-block">
-                <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="images/profile.jpg" alt="">
+                <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="/images/logo.png" alt="">
             </span>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -65,8 +65,7 @@
                 <form class="change-details-form" method="POST" action="/users/change">
 
                     Registered email id:<br>
-                    <input type="email" name="email" id="text_email" disabled
-                        value="<%= email%>" size="35">
+                    <input type="email" name="email" id="text_email" disabled value="<%= email%>" size="35">
                     <input type="button" id="button_email" value="edit" onclick="enableButtonEmail()" /><br>
                     </br>
 
@@ -100,19 +99,35 @@
                     }
                 </script>
             </div>
-
+            <div class="my-auto">
+                <h3 class="mb-0">Contributer
+                </h3>
+                <div class="subheading mb-5">List of Users you added as contributer
+                </div>
+                <ul>
+                    <% for(var i=0; i<contributer.length; i++) {%>
+                    <li>
+                        <form action="/users/removecontributer" method="POST">
+                            <button name="user" type="submit" value="<%= contributer[i] %>" class="btn btn-danger">Delete</button>
+                            <%= contributer[i] %>
+                        </form>
+                    </li>
+                    <% } %>
+                </ul>
+                <a href="/addcontributer"><button type="button" class="btn btn-info">Add Contributer</button></a>
+            </div>
         </section>
-    </div>
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="/vendor/jquery/jquery.min.js"></script>
-    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <hr class="m-0">
+        <!-- Bootstrap core JavaScript -->
+        <script src="/vendor/jquery/jquery.min.js"></script>
+        <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Plugin JavaScript -->
-    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+        <!-- Plugin JavaScript -->
+        <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
 
-    <!-- Custom scripts for this template -->
-    <script src="/js/resume.min.js"></script>
+        <!-- Custom scripts for this template -->
+        <script src="/js/resume.min.js"></script>
 
 </body>
 

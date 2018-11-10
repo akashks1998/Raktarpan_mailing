@@ -270,8 +270,8 @@ router.post("/change", function (req, res, next) {
     .then(function (temp) {
       console.log("Resolve");
       if (u1.verify == 1) {
-        if(req.body.email!=u1.email){
-          u1.verify=0;
+        if (req.body.email != u1.email) {
+          u1.verify = 0;
           let temp = randomstring.generate(7);
           let mailOptions = {
             from: 'kronoskumar252@gmail.com',
@@ -285,19 +285,19 @@ router.post("/change", function (req, res, next) {
               console.log(error);
               res.send("Sorry, server error");
             } else {
-              u1.str=temp;
-              u1.email=req.body.email;
+              u1.str = temp;
+              u1.email = req.body.email;
               updateUser(u1);
               res.redirect("/users");
               console.log('Email sent: ' + info.response);
               return;
             }
           });
-        }else{
-          res.render("/users/settings");
+        } else {
+          res.redirect("/users/settings");
         }
-        if(req.body.password!=''){
-          u1.pas=crypto.createHash("md5").update(req.body.password).digest("hex");
+        if (req.body.password != '') {
+          u1.pas = crypto.createHash("md5").update(req.body.password).digest("hex");
           updateUser(u1);
           res.render("/users/");
         }
@@ -310,6 +310,24 @@ router.post("/change", function (req, res, next) {
       res.render("index");
       return;
     });
+});
+router.get('/home',(req,res)=>{
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function () {
+    if(u1.verify==1){
+      res.render('home',{user:u1});
+    } else {
+        res.render('verification');
+      }
+  })
+  .catch(function () {
+    console.log("Unresolved");
+    res.render("index");
+    return;
+  });
 });
 router.post('/addcontributer', function (req, res) {
   if (req.session.user == undefined || req.session.pass == undefined) {
@@ -355,33 +373,39 @@ router.post('/addcontributer', function (req, res) {
       res.send("Sorry, User doesn't exist");
     });
 
-  }) .catch(function () {
+  }).catch(function () {
     console.log("Unresolved");
     res.render("index");
     return;
   });
 });
-router.get('/contribute',(req,res)=>{
+router.get('/contribute', (req, res) => {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
     return;
   }
   checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function () {
-    res.render('contribute',{contribute:u1.contribute});
-  }) .catch(function () {
+    res.render('contribute', {
+      contribute: u1.contribute
+    });
+  }).catch(function () {
     console.log("Unresolved");
     res.render("index");
     return;
   });
 });
-router.get('/settings',(req,res)=>{
+router.get('/settings', (req, res) => {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
     return;
   }
-  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then( ()=> {
-    res.render("settings",{user:u1.nam,email:u1.email});
-  }) .catch(function () {
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(() => {
+    res.render("settings", {
+      user: u1.nam,
+      email: u1.email,
+      contributer: u1.contributers
+    });
+  }).catch(function () {
     console.log("Unresolved");
     res.render("index");
     return;
@@ -441,7 +465,54 @@ router.post('/forget', function (req, res) {
   });
 
 });
-
+router.post('/removecontributer', (req, res) => {
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(() => {
+    if (u1.verify == 1) {
+      u1.removeContributer(req.body.user);
+      updateUser(u1);
+      let temp;
+      let userexits = new Promise(function (resolve, rej) {
+        MongoClient.connect(
+          url,
+          function (err, db) {
+            if (err) throw err;
+            let dbo = db.db("users");
+            let query = {
+              nam: req.body.user
+            };
+            dbo
+              .collection("users")
+              .find(query)
+              .toArray(function (err, result) {
+                if (err) throw err;
+                console.log("Result" + result.length);
+                if (result.length == 1) {
+                  temp = new user("temp", "temp");
+                  temp.load(result[0]);
+                  resolve(1);
+                } else {
+                  rej(0);
+                }
+                db.close();
+              });
+          }
+        );
+      });
+      userexits.then(()=>{
+        if (temp.contribute.indexOf(u1.nam) > -1) {
+          temp.contribute.splice(temp.contribute.indexOf(u1.nam), 1);
+          updateUser(temp);
+        }
+      });
+    } else {
+      res.redirect('/verification');
+    }
+  });
+});
 router.post('/reset', function (req, res) {
   let temp;
   let ps = crypto.createHash("md5").update(req.body.pass).digest("hex");
