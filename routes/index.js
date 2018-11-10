@@ -9,6 +9,12 @@ router.get('/', function(req, res, next) {
   }
   res.redirect('users');
 });
+router.get('/reset', function(req, res, next) {
+  res.render('reset');
+});
+router.get('/forget', function(req, res, next) {
+  res.render('forget');
+})
 router.get('/fixed', function(req, res, next) {
   if(req.session.user==undefined||req.session.pass==undefined){
     res.render('index');

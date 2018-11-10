@@ -27,6 +27,8 @@ class user {
       .digest("hex");
     this.fixed = [];
     this.verify = verify;
+    this.reset = 0;
+    this.resetcode = '';
     this.str = str;
     this.email = email;
     this.deadline = [];
@@ -42,6 +44,8 @@ class user {
     this.email = obj.email;
     this.pas = obj.pas;
     this.verify = obj.verify;
+    this.reset = obj.reset;
+    this.resetcode = obj.resetcode;
     this.str = obj.str;
     this.fixed = obj.fixed;
     this.deadline = obj.deadline;
@@ -105,7 +109,10 @@ class user {
       }
     }
   }
-
+  reset(code) {
+    this.reset = 1;
+    this.resetcode = code;
+  }
   sceduler() {
     this.x = new Date();
     console.log(this.x.getHours());
@@ -212,7 +219,7 @@ function checkLogin(userName, pass) {
           .find(query)
           .toArray(function (err, result) {
             if (err) throw err;
-            console.log("Result" + result.length+result[0].nam);
+            // console.log("Result" + result.length+result[0].nam);
             if (result.length == 1) {
               console.log("Resolved");
               u1 = new user("temp", "temp");
@@ -251,20 +258,140 @@ router.get("/", function (req, res, next) {
       return;
     });
 });
-router.post('/addcontributer',function(req,res){
+router.post('/addcontributer', function (req, res) {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
     return;
   }
-  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function(){
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function () {
     u1.addContributer(req.body.contributer);
     updateUser(u1);
     res.redirect('/users');
   });
 });
+router.post('/forget', function (req, res) {
+  let temp;
+  let userexits = new Promise(function (resolve, rej) {
+    MongoClient.connect(
+      url,
+      function (err, db) {
+        if (err) throw err;
+        let dbo = db.db("users");
+        let query = {
+          nam: req.body.user
+        };
+        dbo
+          .collection("users")
+          .find(query)
+          .toArray(function (err, result) {
+            if (err) throw err;
+            console.log("Result" + result.length);
+            if (result.length == 1) {
+              temp = new user("temp", "temp");
+              temp.load(result[0]);
+              resolve(1);
+            } else {
+              rej(0);
+            }
+            db.close();
+          });
+      }
+    );
+  });
+  userexits.then(function () {
+    let mailer = new Promise(function (resolve, rej) {
+      let tmp = randomstring.generate(7);
+      let mailOptions = {
+        from: 'kronoskumar252@gmail.com',
+        to: temp.email,
+        subject: 'Conformation mail by Kronos',
+        text: 'Conformation code is ' + tmp
+      };
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          temp.reset(tmp);
+          console.log('Email sent: ' + info.response);
+        }
+      });
+
+    });
+    mailer.then(function () {
+      updateUser(temp);
+      res.redirect('/reset');
+    });
+  }).catch(function () {
+    res.redirect('/forget');
+  });
+});
+
+router.post('/reset', function (req, res) {
+  let temp;
+  let userexits = new Promise(function (resolve, rej) {
+    MongoClient.connect(
+      url,
+      function (err, db) {
+        if (err) throw err;
+        let dbo = db.db("users");
+        let query = {
+          nam: req.body.user
+        };
+        dbo
+          .collection("users")
+          .find(query)
+          .toArray(function (err, result) {
+            if (err) throw err;
+            console.log("Result" + result.length);
+            if (result.length == 1) {
+              temp = new user("temp", "temp");
+              temp.load(result[0]);
+              resolve(1);
+            } else {
+              rej(0);
+            }
+            db.close();
+          });
+      }
+    );
+  });
+  userexits.then(function () {
+    if(temp.reset==1&&temp.resetcode==req.body.code){
+    let mailer = new Promise(function (resolve, rej) {
+      let mailOptions = {
+        from: 'kronoskumar252@gmail.com',
+        to: temp.email,
+        subject: 'Password reset by Kronos',
+        text: 'Dear '+temp.nam+',Your password is reset successfully.'
+      };
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          temp.reset(tmp);
+          console.log('Email sent: ' + info.response);
+        }
+      });
+
+    });
+    mailer.then(function () {
+      temp.pass= crypto.createHash("md5").update(req.body.pass).digest("hex");
+      temp.reset=0;
+      updateUser(temp);
+      res.redirect('/users');
+    });
+  }
+  }).catch(function () {
+    res.redirect('/reset');
+  });
+});
+
+
 router.post('/contributer/:id/deadline',
   function (req, res, next) {
-    let id=req.params.id;
+    let id = req.params.id;
     if (req.session.user == undefined || req.session.pass == undefined) {
       res.render("index");
       return;
@@ -304,7 +431,7 @@ router.post('/contributer/:id/deadline',
             );
           });
           sour.then(function () {
-            console.log("Contributers index"+temp.contributers.indexOf(u1.nam));
+            console.log("Contributers index" + temp.contributers.indexOf(u1.nam));
             if (temp.contributers.indexOf(u1.nam) > -1) {
               if (req.body.deadline != "" && req.body.hours) {
                 temp.adddead(new Date(req.body.deadline), req.body.hours, req.body.name);
@@ -352,7 +479,7 @@ router.post('/contributer/:id/fixed',
       res.render("index");
       return;
     }
-    let id=req.params.id;
+    let id = req.params.id;
 
     checkLogin(u1.nam, u1.pass)
       .then(function (tem) {
