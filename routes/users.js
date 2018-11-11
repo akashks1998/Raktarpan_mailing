@@ -346,7 +346,7 @@ router.get("/home", (req, res) => {
     });
 });
 router.get("/contribute/:id/home", (req, res) => {
-  let id=req.params.id;
+  let id = req.params.id;
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
     return;
@@ -398,7 +398,11 @@ router.get("/contribute/:id/home", (req, res) => {
               "Contributers index" + temp.contributers.indexOf(u1.nam)
             );
             if (temp.contributers.indexOf(u1.nam) > -1) {
-              res.render("home", { user: temp, value: 0, id:"contribute/"+id+"/"  });
+              res.render("home", {
+                user: temp,
+                value: 0,
+                id: "contribute/" + id + "/"
+              });
             } else {
               res.send("Sorry, but you are not a contributer");
             }
@@ -418,8 +422,8 @@ router.get("/contribute/:id/home", (req, res) => {
 });
 
 router.get("/contribute/:id/home/:val", (req, res) => {
-  let id=req.params.id;
-  let val=req.params.val;
+  let id = req.params.id;
+  let val = req.params.val;
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
     return;
@@ -471,7 +475,11 @@ router.get("/contribute/:id/home/:val", (req, res) => {
               "Contributers index" + temp.contributers.indexOf(u1.nam)
             );
             if (temp.contributers.indexOf(u1.nam) > -1) {
-              res.render("home", { user: temp, value: val, id:"contribute/"+id+"/"  });
+              res.render("home", {
+                user: temp,
+                value: val,
+                id: "contribute/" + id + "/"
+              });
             } else {
               res.send("Sorry, but you are not a contributer");
             }
@@ -489,7 +497,7 @@ router.get("/contribute/:id/home/:val", (req, res) => {
       return;
     });
 });
-router.get("/delete/fixed/:id/:val",(req,res)=>{
+router.get("/delete/fixed/:id/:val", (req, res) => {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
     return;
@@ -503,14 +511,14 @@ router.get("/delete/fixed/:id/:val",(req,res)=>{
   )
     .then(function() {
       if (u1.verify == 1) {
-        let id=req.params.id;
-        for(let i=0;i<u1.fixed.length;i++){
-          if(u1.fixed[i][3]==id){
+        let id = req.params.id;
+        for (let i = 0; i < u1.fixed.length; i++) {
+          if (u1.fixed[i][3] == id) {
             u1.fixed.splice(i, 1);
           }
         }
         updateUser(u1);
-        res.redirect("/users/home/"+req.params.val);
+        res.redirect("/users/home/" + req.params.val);
       } else {
         res.render("verification");
       }
@@ -521,7 +529,7 @@ router.get("/delete/fixed/:id/:val",(req,res)=>{
       return;
     });
 });
-router.get("/delete/deadline/:id/:val",(req,res)=>{
+router.get("/delete/deadline/:id/:val", (req, res) => {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
     return;
@@ -535,14 +543,181 @@ router.get("/delete/deadline/:id/:val",(req,res)=>{
   )
     .then(function() {
       if (u1.verify == 1) {
-        let id=req.params.id;
-        for(let i=0;i<u1.deadline.length;i++){
-          if(u1.deadline[i][3]==id){
+        let id = req.params.id;
+        for (let i = 0; i < u1.deadline.length; i++) {
+          if (u1.deadline[i][3] == id) {
             u1.deadline.splice(i, 1);
           }
         }
         updateUser(u1);
-        res.redirect("/users/home/"+req.params.val);
+        res.redirect("/users/home/" + req.params.val);
+      } else {
+        res.render("verification");
+      }
+    })
+    .catch(function() {
+      console.log("Unresolved");
+      res.render("index");
+      return;
+    });
+});
+
+router.get("/contribute/:user/delete/deadline/:id/:val", (req, res) => {
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(
+    req.session.user,
+    crypto
+      .createHash("md5")
+      .update(req.session.pass)
+      .digest("hex")
+  )
+    .then(function() {
+      if (u1.verify == 1) {
+        let temp;
+        let sour = new Promise(function(resolve, reject) {
+          MongoClient.connect(
+            url,
+            function(err, db) {
+              if (err) throw err;
+              let dbo = db.db("users");
+              let query = {
+                nam: req.params.user
+              };
+              dbo
+                .collection("users")
+                .find(query)
+                .toArray(function(err, result) {
+                  if (err) throw err;
+                  console.log("Result" + result.length);
+                  console.log(result);
+                  if (result.length != 0) {
+                    console.log("Resolved");
+                    temp = new user("temp", "temp");
+                    temp.load(result[0]);
+                    resolve("Hi");
+                  } else {
+                    console.log("Unresolved");
+                    reject(0);
+                  }
+
+                  db.close();
+                });
+            }
+          );
+        });
+        sour
+          .then(function() {
+            console.log(
+              "Contributers index" + temp.contributers.indexOf(u1.nam)
+            );
+            if (temp.contributers.indexOf(u1.nam) > -1) {
+              let id = req.params.id;
+              for (let i = 0; i < temp.deadline.length; i++) {
+                if (temp.deadline[i][3] == id) {
+                  temp.deadline.splice(i, 1);
+                }
+              }
+              updateUser(temp);
+              res.redirect(
+                "/users/contribute/" +
+                  req.params.user +
+                  "/home/" +
+                  req.params.val
+              );
+              // res.render("home", { user: temp, value: val, id:"contribute/"+id+"/"  });
+            } else {
+              res.send("Sorry, but you are not a contributer");
+            }
+          })
+          .catch(function() {
+            res.send("Sorry, some server side error");
+          });
+      } else {
+        res.render("verification");
+      }
+    })
+    .catch(function() {
+      console.log("Unresolved");
+      res.render("index");
+      return;
+    });
+});
+router.get("/contribute/:user/delete/fixed/:id/:val", (req, res) => {
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(
+    req.session.user,
+    crypto
+      .createHash("md5")
+      .update(req.session.pass)
+      .digest("hex")
+  )
+    .then(function() {
+      if (u1.verify == 1) {
+        let temp;
+        let sour = new Promise(function(resolve, reject) {
+          MongoClient.connect(
+            url,
+            function(err, db) {
+              if (err) throw err;
+              let dbo = db.db("users");
+              let query = {
+                nam: req.params.user
+              };
+              dbo
+                .collection("users")
+                .find(query)
+                .toArray(function(err, result) {
+                  if (err) throw err;
+                  console.log("Result" + result.length);
+                  console.log(result);
+                  if (result.length != 0) {
+                    console.log("Resolved");
+                    temp = new user("temp", "temp");
+                    temp.load(result[0]);
+                    resolve("Hi");
+                  } else {
+                    console.log("Unresolved");
+                    reject(0);
+                  }
+
+                  db.close();
+                });
+            }
+          );
+        });
+        sour
+          .then(function() {
+            console.log(
+              "Contributers index" + temp.contributers.indexOf(u1.nam)
+            );
+            if (temp.contributers.indexOf(u1.nam) > -1) {
+              let id = req.params.id;
+              for (let i = 0; i < temp.fixed.length; i++) {
+                if (temp.fixed[i][3] == id) {
+                  temp.fixed.splice(i, 1);
+                }
+              }
+              updateUser(temp);
+              res.redirect(
+                "/users/contribute/" +
+                  req.params.user +
+                  "/home/" +
+                  req.params.val
+              );
+              // res.render("home", { user: temp, value: val, id:"contribute/"+id+"/"  });
+            } else {
+              res.send("Sorry, but you are not a contributer");
+            }
+          })
+          .catch(function() {
+            res.send("Sorry, some server side error");
+          });
       } else {
         res.render("verification");
       }
