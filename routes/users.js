@@ -1,6 +1,6 @@
 let express = require("express");
 let MongoClient = require("mongodb").MongoClient;
-let url = "mongodb://localhost:27017/";
+let url = "mongodb://akashks:TVTkrjgEXdaz5k8@ds219191.mlab.com:19191/users";
 let crypto = require("crypto");
 let randomstring = require("randomstring");
 
