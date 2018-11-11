@@ -13,7 +13,12 @@ let transporter = nodemailer.createTransport({
     pass: "kronos252"
   }
 });
-
+function calcTime(offset) {
+  d = new Date();
+  utc = d.getTime();
+  //  + (d.getTimezoneOffset() * 60000);
+  return new Date(utc + (3600000*offset));
+}
 let router = express.Router();
 class user {
   constructor(nam, pas, email, verify, str) {
@@ -116,8 +121,8 @@ class user {
     this.resetcode = code;
   }
   sceduler() {
-    this.x = new Date();
-    console.log(this.x.getHours());
+    this.x = calcTime("+5.5");
+    //console.log(this.x.getHours());
 
     if (this.x.getHours() < 7) {
       this.scedule = [0, 0, "Sleep", 0];
@@ -190,10 +195,10 @@ function updateUser(user) {
         let newval = {
           $set: JSON.parse(JSON.stringify(user))
         };
-        console.log(user.pas);
+        //console.log(user.pas);
         dbo.collection("users").updateOne(query, newval, function(err, res) {
           if (err) throw err;
-          console.log("1 document updated");
+          //console.log("1 document updated");
         });
         resolve("Hi");
         db.close();
@@ -213,20 +218,20 @@ function checkLogin(userName, pass) {
           nam: userName,
           pas: pass
         };
-        console.log(query.pas);
+        //console.log(query.pas);
         dbo
           .collection("users")
           .find(query)
           .toArray(function(err, result) {
             if (err) throw err;
-            // console.log("Result" + result.length+result[0].nam);
+            // //console.log("Result" + result.length+result[0].nam);
             if (result.length == 1) {
-              console.log("Resolved");
+              //console.log("Resolved");
               u1 = new user("temp", "temp");
               u1.load(result[0]);
               resolve("Hi");
             } else {
-              console.log("Unresolved");
+              //console.log("Unresolved");
               reject(0);
             }
 
@@ -251,7 +256,7 @@ router.get("/", function(req, res, next) {
       .digest("hex")
   )
     .then(function(temp) {
-      console.log("Resolve");
+      //console.log("Resolve");
       if (u1.verify == 1) {
         res.redirect("/users/home");
       } else {
@@ -259,7 +264,7 @@ router.get("/", function(req, res, next) {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -277,7 +282,7 @@ router.post("/change", function(req, res, next) {
       .digest("hex")
   )
     .then(function(temp) {
-      console.log("Resolve");
+      //console.log("Resolve");
       if (u1.verify == 1) {
         if (req.body.email != null && req.body.email != u1.email) {
           let temp = randomstring.generate(7);
@@ -290,7 +295,7 @@ router.post("/change", function(req, res, next) {
 
           transporter.sendMail(mailOptions, function(error, info) {
             if (error) {
-              console.log(error);
+              //console.log(error);
               res.send("Sorry, server error");
               return;
             } else {
@@ -298,7 +303,7 @@ router.post("/change", function(req, res, next) {
               u1.email = req.body.email;
               u1.verify = 0;
               updateUser(u1);
-              console.log("Email sent: " + info.response);
+              //console.log("Email sent: " + info.response);
             }
           });
         }
@@ -318,7 +323,7 @@ router.post("/change", function(req, res, next) {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -333,12 +338,12 @@ router.post('/email', function(req, res){
     if(u1.verify==1){
         if(req.body.email_check == 1)
         {
-          console.log("Hiiiiiii");
+          //console.log("Hiiiiiii");
           u1.emailNotify = 1;
           updateUser(u1);
         }
         else{
-          console.log("Noooooooo");
+          //console.log("Noooooooo");
           u1.emailNotify = 0;
           updateUser(u1);
         }
@@ -349,7 +354,7 @@ router.post('/email', function(req, res){
     }
   })
   .catch(function () {
-    console.log("Unresolved");
+    //console.log("Unresolved");
     res.render("index");
     return;
   });
@@ -375,7 +380,7 @@ router.get('/home',(req,res)=>{
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -410,15 +415,15 @@ router.get("/contribute/:id/home", (req, res) => {
                 .find(query)
                 .toArray(function(err, result) {
                   if (err) throw err;
-                  console.log("Result" + result.length);
-                  console.log(result);
+                  //console.log("Result" + result.length);
+                  //console.log(result);
                   if (result.length != 0) {
-                    console.log("Resolved");
+                    //console.log("Resolved");
                     temp = new user("temp", "temp");
                     temp.load(result[0]);
                     resolve("Hi");
                   } else {
-                    console.log("Unresolved");
+                    //console.log("Unresolved");
                     reject(0);
                   }
 
@@ -429,9 +434,9 @@ router.get("/contribute/:id/home", (req, res) => {
         });
         sour
           .then(function() {
-            console.log(
-              "Contributers index" + temp.contributers.indexOf(u1.nam)
-            );
+            //console.log(
+            //   "Contributers index" + temp.contributers.indexOf(u1.nam)
+            // );
             if (temp.contributers.indexOf(u1.nam) > -1) {
               res.render("home", {
                 user: temp,
@@ -450,7 +455,7 @@ router.get("/contribute/:id/home", (req, res) => {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -487,15 +492,15 @@ router.get("/contribute/:id/home/:val", (req, res) => {
                 .find(query)
                 .toArray(function(err, result) {
                   if (err) throw err;
-                  console.log("Result" + result.length);
-                  console.log(result);
+                  //console.log("Result" + result.length);
+                  //console.log(result);
                   if (result.length != 0) {
-                    console.log("Resolved");
+                    //console.log("Resolved");
                     temp = new user("temp", "temp");
                     temp.load(result[0]);
                     resolve("Hi");
                   } else {
-                    console.log("Unresolved");
+                    //console.log("Unresolved");
                     reject(0);
                   }
 
@@ -506,9 +511,9 @@ router.get("/contribute/:id/home/:val", (req, res) => {
         });
         sour
           .then(function() {
-            console.log(
-              "Contributers index" + temp.contributers.indexOf(u1.nam)
-            );
+            //console.log(
+            //   "Contributers index" + temp.contributers.indexOf(u1.nam)
+            // );
             if (temp.contributers.indexOf(u1.nam) > -1) {
               res.render("home", {
                 user: temp,
@@ -527,7 +532,7 @@ router.get("/contribute/:id/home/:val", (req, res) => {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -559,7 +564,7 @@ router.get("/delete/fixed/:id/:val", (req, res) => {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -591,7 +596,7 @@ router.get("/delete/deadline/:id/:val", (req, res) => {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -626,15 +631,15 @@ router.get("/contribute/:user/delete/deadline/:id/:val", (req, res) => {
                 .find(query)
                 .toArray(function(err, result) {
                   if (err) throw err;
-                  console.log("Result" + result.length);
-                  console.log(result);
+                  //console.log("Result" + result.length);
+                  //console.log(result);
                   if (result.length != 0) {
-                    console.log("Resolved");
+                    //console.log("Resolved");
                     temp = new user("temp", "temp");
                     temp.load(result[0]);
                     resolve("Hi");
                   } else {
-                    console.log("Unresolved");
+                    //console.log("Unresolved");
                     reject(0);
                   }
 
@@ -645,9 +650,9 @@ router.get("/contribute/:user/delete/deadline/:id/:val", (req, res) => {
         });
         sour
           .then(function() {
-            console.log(
-              "Contributers index" + temp.contributers.indexOf(u1.nam)
-            );
+            //console.log(
+            //   "Contributers index" + temp.contributers.indexOf(u1.nam)
+            // );
             if (temp.contributers.indexOf(u1.nam) > -1) {
               let id = req.params.id;
               for (let i = 0; i < temp.deadline.length; i++) {
@@ -675,7 +680,7 @@ router.get("/contribute/:user/delete/deadline/:id/:val", (req, res) => {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -709,15 +714,15 @@ router.get("/contribute/:user/delete/fixed/:id/:val", (req, res) => {
                 .find(query)
                 .toArray(function(err, result) {
                   if (err) throw err;
-                  console.log("Result" + result.length);
-                  console.log(result);
+                  //console.log("Result" + result.length);
+                  //console.log(result);
                   if (result.length != 0) {
-                    console.log("Resolved");
+                    //console.log("Resolved");
                     temp = new user("temp", "temp");
                     temp.load(result[0]);
                     resolve("Hi");
                   } else {
-                    console.log("Unresolved");
+                    //console.log("Unresolved");
                     reject(0);
                   }
 
@@ -728,9 +733,9 @@ router.get("/contribute/:user/delete/fixed/:id/:val", (req, res) => {
         });
         sour
           .then(function() {
-            console.log(
-              "Contributers index" + temp.contributers.indexOf(u1.nam)
-            );
+            //console.log(
+            //   "Contributers index" + temp.contributers.indexOf(u1.nam)
+            // );
             if (temp.contributers.indexOf(u1.nam) > -1) {
               let id = req.params.id;
               for (let i = 0; i < temp.fixed.length; i++) {
@@ -758,7 +763,7 @@ router.get("/contribute/:user/delete/fixed/:id/:val", (req, res) => {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -784,7 +789,7 @@ router.get("/home/:val", (req, res) => {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -818,7 +823,7 @@ router.post("/addcontributer", function(req, res) {
               .find(query)
               .toArray(function(err, result) {
                 if (err) throw err;
-                console.log("Result" + result.length);
+                //console.log("Result" + result.length);
                 if (result.length == 1) {
                   temp = new user("temp", "temp");
                   temp.load(result[0]);
@@ -844,7 +849,7 @@ router.post("/addcontributer", function(req, res) {
         });
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -867,7 +872,7 @@ router.get("/contribute", (req, res) => {
       });
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -893,7 +898,7 @@ router.get("/settings", (req, res) => {
       });
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -914,7 +919,7 @@ router.post("/forget", function(req, res) {
           .find(query)
           .toArray(function(err, result) {
             if (err) throw err;
-            console.log("Result" + result.length);
+            //console.log("Result" + result.length);
             if (result.length == 1) {
               temp = new user("temp", "temp");
               temp.load(result[0]);
@@ -938,10 +943,10 @@ router.post("/forget", function(req, res) {
 
     transporter.sendMail(mailOptions, function(error, info) {
       if (error) {
-        console.log(error);
+        //console.log(error);
         res.render("/forget");
       } else {
-        console.log("Email sent: " + info.response);
+        //console.log("Email sent: " + info.response);
         updateUser(temp);
       }
     });
@@ -979,7 +984,7 @@ router.post("/removecontributer", (req, res) => {
               .find(query)
               .toArray(function(err, result) {
                 if (err) throw err;
-                console.log("Result" + result.length);
+                //console.log("Result" + result.length);
                 if (result.length == 1) {
                   temp = new user("temp", "temp");
                   temp.load(result[0]);
@@ -1023,7 +1028,7 @@ router.post("/reset", function(req, res) {
           .find(query)
           .toArray(function(err, result) {
             if (err) throw err;
-            console.log("Result" + result.length);
+            //console.log("Result" + result.length);
             if (result.length == 1) {
               temp = new user("temp", "temp");
               temp.load(result[0]);
@@ -1049,21 +1054,21 @@ router.post("/reset", function(req, res) {
 
         transporter.sendMail(mailOptions, function(error, info) {
           if (error) {
-            console.log(error);
+            //console.log(error);
           } else {
-            console.log("Email sent: " + info.response);
+            //console.log("Email sent: " + info.response);
           }
         });
         let x = new Promise(function(resolve, rej) {
           temp.pas = ps;
           temp.reset = 0;
-          console.log(
-            "Password is " +
-              crypto
-                .createHash("md5")
-                .update(req.body.pass)
-                .digest("hex")
-          );
+          //console.log(
+          //   "Password is " +
+          //     crypto
+          //       .createHash("md5")
+          //       .update(req.body.pass)
+          //       .digest("hex")
+          // );
           resolve();
         });
         x.then(() => {
@@ -1112,15 +1117,15 @@ router.post("/contributer/:id/deadline", function(req, res, next) {
                 .find(query)
                 .toArray(function(err, result) {
                   if (err) throw err;
-                  console.log("Result" + result.length);
-                  console.log(result);
+                  //console.log("Result" + result.length);
+                  //console.log(result);
                   if (result.length != 0) {
-                    console.log("Resolved");
+                    //console.log("Resolved");
                     temp = new user("temp", "temp");
                     temp.load(result[0]);
                     resolve("Hi");
                   } else {
-                    console.log("Unresolved");
+                    //console.log("Unresolved");
                     reject(0);
                   }
 
@@ -1131,9 +1136,9 @@ router.post("/contributer/:id/deadline", function(req, res, next) {
         });
         sour
           .then(function() {
-            console.log(
-              "Contributers index" + temp.contributers.indexOf(u1.nam)
-            );
+            //console.log(
+            //   "Contributers index" + temp.contributers.indexOf(u1.nam)
+            // );
             if (temp.contributers.indexOf(u1.nam) > -1) {
               if (req.body.deadline != "" && req.body.hours) {
                 temp.adddead(
@@ -1155,15 +1160,15 @@ router.post("/contributer/:id/deadline", function(req, res, next) {
                     };
                     transporter.sendMail(mailOptions, function(error, info) {
                       if (error) {
-                        console.log(error);
+                        //console.log(error);
                       } else {
-                        console.log("Email sent: " + info.response);
+                        //console.log("Email sent: " + info.response);
                       }
                     });
                     res.redirect("/users/contribute/"+temp.nam+"/home");
                   })
                   .catch(function() {
-                    console.log("Sorry");
+                    //console.log("Sorry");
                   });
               }
             } else {
@@ -1178,7 +1183,7 @@ router.post("/contributer/:id/deadline", function(req, res, next) {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -1214,15 +1219,15 @@ router.post("/contributer/:id/fixed", function(req, res, next) {
                 .find(query)
                 .toArray(function(err, result) {
                   if (err) throw err;
-                  console.log("Result" + result.length);
-                  console.log(result);
+                  //console.log("Result" + result.length);
+                  //console.log(result);
                   if (result.length != 0) {
-                    console.log("Resolved");
+                    //console.log("Resolved");
                     temp = new user("temp", "temp");
                     temp.load(result[0]);
                     resolve("Hi");
                   } else {
-                    console.log("Unresolved");
+                    //console.log("Unresolved");
                     reject(0);
                   }
 
@@ -1255,14 +1260,14 @@ router.post("/contributer/:id/fixed", function(req, res, next) {
                     };
                     transporter.sendMail(mailOptions, function(error, info) {
                       if (error) {
-                        console.log(error);
+                        //console.log(error);
                       } else {
-                        console.log("Email sent: " + info.response);
+                        //console.log("Email sent: " + info.response);
                       }
                     });
                     res.redirect("/users/contribute/"+temp.nam+"/home");
                     }).catch(function() {
-                    console.log("Sorry");
+                    //console.log("Sorry");
                   });
               }
             } else {
@@ -1277,7 +1282,7 @@ router.post("/contributer/:id/fixed", function(req, res, next) {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -1318,7 +1323,7 @@ router.post("/", function(req, res, next) {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -1336,7 +1341,7 @@ router.post("/verify", function(req, res, next) {
       .digest("hex")
   )
     .then(function(temp) {
-      console.log("Resolve");
+      //console.log("Resolve");
       if (u1.str == req.body.code && u1.verify == 0) {
         u1.verify = 1;
         updateUser(u1);
@@ -1346,7 +1351,7 @@ router.post("/verify", function(req, res, next) {
       }
     })
     .catch(function() {
-      console.log("Unresolved");
+      //console.log("Unresolved");
       res.render("index");
       return;
     });
@@ -1368,7 +1373,7 @@ router.post("/signup", function(req, res, next) {
           .find(query)
           .toArray(function(err, result) {
             if (err) throw err;
-            console.log("Result" + result.length);
+            //console.log("Result" + result.length);
             if (result.length != 0) {
               rej(1);
             } else {
@@ -1398,13 +1403,13 @@ router.post("/signup", function(req, res, next) {
 
           transporter.sendMail(mailOptions, function(error, info) {
             if (error) {
-              console.log(error);
+              //console.log(error);
             } else {
-              console.log("Email sent: " + info.response);
+              //console.log("Email sent: " + info.response);
             }
           });
 
-          console.log(JSON.stringify(u1));
+          //console.log(JSON.stringify(u1));
           dbo.collection("users").insertOne(JSON.parse(JSON.stringify(u1)));
           if (err) throw err;
         }
@@ -1432,7 +1437,7 @@ setInterval(function() {
           .find({})
           .toArray(function(err, result) {
             if (err) throw err;
-            console.log("Result " + result.length);
+            //console.log("Result " + result.length);
             for (i = 0; i < result.length; i++) {
               let temp = new user("temp", "temp");
               temp.load(result[i]);
@@ -1448,15 +1453,15 @@ setInterval(function() {
                   if(u1.emailNotify==1){
                   transporter.sendMail(mailOptions, function (error, info) {
                     if (error) {
-                      console.log(error);
+                      //console.log(error);
                     } else {
-                      console.log("Email sent: " + info.response);
+                      //console.log("Email sent: " + info.response);
                     }
                   });
                 }
                 }
               ).catch(function () {
-                console.log("Sorry");
+                //console.log("Sorry");
               });
             }
           });
