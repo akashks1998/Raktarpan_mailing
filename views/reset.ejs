@@ -52,7 +52,7 @@
                         <span class="focus-input100" data-placeholder="Verification Code"></span>
                     </div>
                     <div class="wrap-input100 validate-input m-b-50" data-validate="Enter password">
-                        <input class="input100" type="password" name="pass" id="passing" onkeypress="passwordStrength()">
+                        <input class="input100" type="password" name="pass" id="passing" onkeydown="passwordStrength()">
                         <span class="focus-input100" data-placeholder="New Password"></span>
                         <script>
 						
@@ -132,7 +132,7 @@
 							//common passwords
 							var tmp = 0
 							var meter_val = 0;
-						let pass=document.getElementById('passing').value;
+						    let pass=document.getElementById('passing').value;
 							for(var i = 0;i<len;i++)
 							{
 								tmp = maximum(string_match(dict[i],pass,true),tmp)
