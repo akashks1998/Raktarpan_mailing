@@ -70,7 +70,7 @@
       <%
             let temp=new Date();
             let tomorrow = new Date(temp.toLocaleDateString("en-US"));
-            let options = {  year: 'numeric', month: 'long', day: 'numeric' };
+            let options = { year: 'numeric', month: 'long', day: 'numeric' };
             if(value!=null){
               tomorrow.setDate(tomorrow.getDate() + parseInt(value,10));
             }
@@ -170,8 +170,7 @@
     .center {
       margin-left: 50%;
       margin-right: 50%;
-      width: 100vw;
-      padding: 10px;
+      width: 20vw;
     }
 
     .round-button {

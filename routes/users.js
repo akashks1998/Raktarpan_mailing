@@ -696,7 +696,7 @@ router.post('/contributer/:id/fixed',
     }
     let id = req.params.id;
 
-    checkLogin(u1.nam, u1.pass)
+    checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex"))
       .then(function (tem) {
         if (u1.verify == 1) {
           let temp;
@@ -734,8 +734,8 @@ router.post('/contributer/:id/fixed',
           sour.then(function () {
             temp.contributers.indexOf(u1.nam)
             if (temp.contributers.indexOf(u1.nam) > -1) {
-              if (req.body.start && req.body.end) {
-                u1.addfixed(
+              if (req.body.start!=null && req.body.end!=null) {
+                temp.addfixed(
                   new Date(req.body.start),
                   new Date(req.body.end),
                   req.body.name
