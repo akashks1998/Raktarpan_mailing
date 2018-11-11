@@ -33,7 +33,7 @@
 
     <div class="limiter">
         <div class="container-login100">
-            <div class="wrap-login100 p-t-85 p-b-20">
+            <div class="wrap-login100 p-t-85 p-b-20" style="margin-top:-30px">
                 <form class="login100-form validate-form" method="POST" action="/users/reset">
                     <span class="login100-form-title p-b-70">
                         Reset Password
@@ -42,7 +42,7 @@
                         <img src="/images/logo.png" alt="AVATAR">
                     </span>
 
-                    <div class="wrap-input100 validate-input m-t-85 m-b-35" data-validate="Enter Username">
+                    <div class="wrap-input100 validate-input m-t-85 m-b-35" data-validate="Enter Username" style="margin-top:-20px">
                         <input class="input100" type="text" name="user">
                         <span class="focus-input100" data-placeholder="User"></span>
                     </div>
@@ -52,15 +52,253 @@
                         <span class="focus-input100" data-placeholder="Verification Code"></span>
                     </div>
                     <div class="wrap-input100 validate-input m-b-50" data-validate="Enter password">
-                        <input class="input100" type="password" name="pass">
+                        <input class="input100" type="password" name="pass" id="passing" onkeypress="passwordStrength()">
                         <span class="focus-input100" data-placeholder="New Password"></span>
+                        <script>
+						
+
+							function  maximum(a,b)
+						{
+							if (a>b)
+								return a
+							else
+								return b
+						}
+
+							function string_match(first, second, percent)
+						{
+							if (first === null ||
+								second === null ||
+								typeof first === 'undefined' ||
+								typeof second === 'undefined') {
+								return 0
+							}
+
+							first += ''
+							second += ''
+
+							var pos1 = 0
+							var pos2 = 0
+							var max = 0
+							var Lf = first.length
+							var Ls = second.length
+							var i
+							var j
+							var k
+							var sum
+							for (i=0; i<Lf; i++)
+							{
+								for(j=0; j<Ls; j++)
+								{
+									for(k=0; (i+k < Lf) && (j+k < Ls) && (first.charAt(i+k) === second.charAt(j+k)); k++)
+									{}
+									if (k > max)
+									{
+										max=k
+										pos1=i
+										pos2=j
+									}
+								}
+							}
+							sum=max
+							if(sum)
+							{
+								if(pos1 && pos2)
+								{
+									sum+= string_match(first.substr(0,pos1), second.substr(0,pos2))
+								}
+								if ((pos1 + max < Lf) && (pos2+max < Ls))
+								{
+									sum+=string_match(first.substr(pos1+max, Lf-pos1-max), second.substr(pos2+max, Ls-pos2-max))
+								}
+							}
+							if(!percent)
+							{
+								return sum
+							}
+							return (sum*200)/(Lf+Ls)
+						}
+							function passwordStrength(){
+							console.log(document.getElementById('passing').value);
+							var dict=["123456","123456789","qwerty","12345678","111111","1234567890","1234567","password","123123","987654321","qwertyuiop","mynoob","123321","666666","18atcskd2w","7777777","1q2w3e4r","654321","555555","3rjs1la7qe", "google","1q2w3e4r5t","123qwe","zxcvbnm","1q2w3e"]
+						var len = dict.length
+						var strength = {
+							0: "Worst",
+							1: "Bad",
+							2: "Weak",
+							3: "Good",
+							4: "Strong"
+						  }
+							//common passwords
+							var tmp = 0
+							var meter_val = 0;
+						let pass=document.getElementById('passing').value;
+							for(var i = 0;i<len;i++)
+							{
+								tmp = maximum(string_match(dict[i],pass,true),tmp)
+								tmp = maximum(string_match(pass,dict[i],true),tmp)
+							}
+							var meter = document.getElementById('password-strength-meter');
+							var text = document.getElementById('password-strength-text');
+                            var warning = document.getElementById('warning-text');
+                            
+                            var meter1 = document.getElementById('meter-red');
+                            var meter2 = document.getElementById('meter-yellow');
+                            var meter3 = document.getElementById('meter-orange');
+                            var meter4 = document.getElementById('meter-green');
+							// Update the password strength meter
+						
+							if(pass.length < 6)
+							{
+								meter.value = 0;
+								text.innerHTML = "";
+                                warning.innerHTML = "Passwords must be at least 6 characters long.";
+                                meter1.style.background = "whitesmoke";
+                                meter2.style.background = "whitesmoke";
+                                meter3.style.background = "whitesmoke";
+                                meter4.style.background = "whitesmoke";
+							}
+							else
+							{
+								tmp=tmp+40-pass.length*4;
+								if(tmp >= 80)
+								{
+                                    meter_val = 1;
+                                    meter1.style.backgroundColor = "red";
+                                    meter2.style.background = "whitesmoke";
+                                    meter3.style.background = "whitesmoke";
+                                    meter4.style.background = "whitesmoke";
+								}
+								else if(tmp >= 60 && tmp < 80)
+								{
+                                    meter_val = 2;
+                                    meter1.style.background = "yellow";
+                                    meter2.style.background = "yellow";
+                                    meter3.style.background = "whitesmoke";
+                                    meter4.style.background = "whitesmoke";
+								}
+								else if(tmp >= 40 && tmp < 60)
+								{
+                                    meter_val = 3;
+                                    meter1.style.background = "orange";
+                                    meter2.style.background = "orange";
+                                    meter3.style.background = "orange";
+                                    meter4.style.background = "whitesmoke";
+								}
+								else
+								{
+                                    meter_val = 4;
+                                    meter1.style.background = "green";
+                                    meter2.style.background = "green";
+                                    meter3.style.background = "green";
+                                    meter4.style.background = "green";
+								}
+								meter.value = meter_val;
+								text.innerHTML = "STRENGTH: " + "<strong>" + strength[meter.value];
+								warning.innerHTML = "";
+							}
+							if(meter_val<3){
+								console.log("hi");
+
+								document.getElementById("submit").disabled=true;
+							}else{
+								document.getElementById("submit").disabled=false;
+							}
+						}
+						</script>
                     </div>
-                    <div class="container-login100-form-btn">
+                        <meter max="4" id="password-strength-meter">
+                            <div id="meter-gauge">
+                                    <div id="meter-red" style="width: 25%; float:left"></div>
+                                    <div id="meter-yellow" style="width: 25%; float:left"></div>
+                                    <div id="meter-orange" style="width: 25%; float:left"></div>
+                                    <div id="meter-green" style="width: 25%; float:left"></div>
+                                    <div style="clear: both;"></div>
+                            </div>
+                        </meter>
+                        <style>
+                            meter {
+                                /* Reset the default appearance */
+                                -webkit-appearance: none;
+                                -moz-appearance: none;
+                                        appearance: none;
+                                        
+                                margin: 0 auto 1em;
+                                width: 100%;
+                                height: .5em;
+                                
+                                /* Applicable only to Firefox */
+                                background: none;
+                                background-color: rgba(0,0,0,0.1);
+                            }
+
+                            meter::-webkit-meter-bar {
+                                background: none;
+                                background-color: rgba(0,0,0,0.1);
+                            }
+
+                            meter[value="1"]::-webkit-meter-optimum-value { background: red; }
+                            meter[value="2"]::-webkit-meter-optimum-value { background: yellow; }
+                            meter[value="3"]::-webkit-meter-optimum-value { background: orange; }
+                            meter[value="4"]::-webkit-meter-optimum-value { background: green; }
+
+                            meter[value="1"]::-moz-meter-bar { background: red; }
+                            meter[value="2"]::-moz-meter-bar { background: yellow; }
+                            meter[value="3"]::-moz-meter-bar { background: orange; }
+                            meter[value="4"]::-moz-meter-bar { background: green; }
+
+                            #warning-text{
+                                color: red;
+                            }
+
+                            #password-strength-check{
+                                color: rgb(9, 9, 172);
+                            }
+
+                            #meter-gauge {
+                                border: 1px solid #ccc;
+                                border-radius: 3px;
+                                box-shadow: 0 5px 5px -5px #333 inset;
+                                margin: 0 auto 1em;
+                                width: 100%;
+                                height: .5em;
+                                display: block;
+                            }
+
+                            #meter-gauge > span {
+                                margin: 0 auto 1em;
+                                width: 100%;
+                                height: .5em;    
+                                background-size: 100% 100%;
+                                display: block;
+                                text-indent: -9999px;
+                                background: linear-gradient(to right, whitesmoke 100%);
+                            }
+
+                            #meter-red{
+                                background-color: whitesmoke;
+                                height: .5em;
+                            }
+                            #meter-yellow{
+                                background-color: whitesmoke;
+                                height: .5em;
+                            }
+                            #meter-orange{
+                                background-color: whitesmoke;
+                                height: .5em;
+                            }
+                            #meter-green{
+                                background-color: whitesmoke;
+                                height: .5em;
+                            }
+                        </style>
+                        <p id="warning-text"></p>
+                        <p id="password-strength-text"></p>
+                    <div class="container-login100-form-btn" style="margin-top:20px">
                         <button class="login100-form-btn">
                             Reset Password
                         </button>
                     </div>
-                    <p><br><center>Didn't receive code?<a href="/forget" class="txt2"> Send again </a></center></p>
                 </form>
             </div>
         </div>
