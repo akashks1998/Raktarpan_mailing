@@ -37,7 +37,7 @@ class user {
     this.deadline = [];
     this.idfix = 0;
     this.iddead = 0;
-    this.scedule = [];
+    this.scedule = [0, 0, "Free", 0];
     this.err = 0;
     this.hour = 0;
     this.contributers = [];
