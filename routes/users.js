@@ -375,7 +375,8 @@ router.get('/home', (req, res) => {
         res.render("home", {
           user: u1,
           value: 0,
-          id: ""
+          id: "",
+          us:'My'
         });
       } else {
         res.render("verification");
@@ -443,7 +444,8 @@ router.get("/contribute/:id/home", (req, res) => {
               res.render("home", {
                 user: temp,
                 value: 0,
-                id: "contribute/" + id + "/"
+                id: "contribute/" + id + "/",
+                us:temp.nam+"'s"
               });
             } else {
               res.send("Sorry, but you are not a contributer");
@@ -520,7 +522,8 @@ router.get("/contribute/:id/home/:val", (req, res) => {
               res.render("home", {
                 user: temp,
                 value: val,
-                id: "contribute/" + id + "/"
+                id: "contribute/" + id + "/",
+                us:temp.nam+"'s"
               });
             } else {
               res.send("Sorry, but you are not a contributer");
@@ -792,7 +795,8 @@ router.get("/home/:val", (req, res) => {
         res.render("home", {
           user: u1,
           value: value,
-          id: ""
+          id: "",
+          us:"My"
         });
       } else {
         res.render("verification");
