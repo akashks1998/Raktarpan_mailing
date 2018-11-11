@@ -489,8 +489,70 @@ router.get("/contribute/:id/home/:val", (req, res) => {
       return;
     });
 });
-
-
+router.get("/delete/fixed/:id/:val",(req,res)=>{
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(
+    req.session.user,
+    crypto
+      .createHash("md5")
+      .update(req.session.pass)
+      .digest("hex")
+  )
+    .then(function() {
+      if (u1.verify == 1) {
+        let id=req.params.id;
+        for(let i=0;i<u1.fixed.length;i++){
+          if(u1.fixed[i][3]==id){
+            u1.fixed.splice(i, 1);
+          }
+        }
+        updateUser(u1);
+        res.redirect("/users/home/"+req.params.val);
+      } else {
+        res.render("verification");
+      }
+    })
+    .catch(function() {
+      console.log("Unresolved");
+      res.render("index");
+      return;
+    });
+});
+router.get("/delete/deadline/:id/:val",(req,res)=>{
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(
+    req.session.user,
+    crypto
+      .createHash("md5")
+      .update(req.session.pass)
+      .digest("hex")
+  )
+    .then(function() {
+      if (u1.verify == 1) {
+        let id=req.params.id;
+        for(let i=0;i<u1.deadline.length;i++){
+          if(u1.deadline[i][3]==id){
+            u1.deadline.splice(i, 1);
+          }
+        }
+        updateUser(u1);
+        res.redirect("/users/home/"+req.params.val);
+      } else {
+        res.render("verification");
+      }
+    })
+    .catch(function() {
+      console.log("Unresolved");
+      res.render("index");
+      return;
+    });
+});
 router.get("/home/:val", (req, res) => {
   let value = req.params.val;
   if (req.session.user == undefined || req.session.pass == undefined) {
