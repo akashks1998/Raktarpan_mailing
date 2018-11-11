@@ -92,8 +92,8 @@
             <%=user.fixed[j][2]%>
           </div>
           <div id="fixed<%= i%>o<%=j%>d" class="dropdown-content">
-            <a class="tun" href="/users/edit/fixed/<%=user.fixed[j][3]%>">Edit</a>
-            <a class="tun" href="/users/delete/fixed/<%=user.fixed[j][3]%>">Delete</a>
+            <a class="tun" href="/users/<%= id%>edit/fixed/<%=user.fixed[j][3]%>">Edit</a>
+            <a class="tun" href="/users/<%= id%>delete/fixed/<%=user.fixed[j][3]%>">Delete</a>
           </div>
           <%
               
@@ -111,8 +111,8 @@
             <%=user.deadline[j][2]%>
           </div>
           <div id="deadline<%= i%>o<%=j%>d" class="dropdown-content">
-            <a class="tun" href="/users/edit/deadline/<%=user.deadline[j][3]%>">Edit</a>
-            <a class="tun" href="/users/delete/deadline/<%=user.deadline[j][3]%>">Delete</a>
+            <a class="tun" href="/users/<%= id%>edit/deadline/<%=user.deadline[j][3]%>">Edit</a>
+            <a class="tun" href="/users/<%= id%>delete/deadline/<%=user.deadline[j][3]%>">Delete</a>
           </div>
           <%
 
@@ -157,13 +157,13 @@
       <% } %>
     </table>
     <div class="center">
-      <a href="/users/home/<%=parseInt(value,10)-5%>" class="next round cc">
-        <</a> <a href="/users/home/<%=parseInt(value,10)+5%>" class="next round cc">>
+      <a href="/users/<%= id%>home/<%=parseInt(value,10)-5%>" class="next round cc">
+        <</a> <a href="/users/<%= id%>home/<%=parseInt(value,10)+5%>" class="next round cc">>
       </a>
     </div>
   </div>
   <div class="round-button">
-    <div class="round-button-circle"><a href="/fixed" class="round-button">+</a></div>
+    <div class="round-button-circle"><a href="/<%=id%>fixed" class="round-button">+</a></div>
   </div>
 
   <style>
