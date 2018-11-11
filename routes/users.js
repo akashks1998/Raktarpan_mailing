@@ -1016,6 +1016,7 @@ router.post("/removecontributer", (req, res) => {
           temp.contribute.splice(temp.contribute.indexOf(u1.nam), 1);
           updateUser(temp);
         }
+        res.redirect('/settings');
       });
     } else {
       res.redirect("/verification");
