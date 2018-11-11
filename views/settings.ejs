@@ -61,17 +61,17 @@
         <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="interests">
             <div class="my-auto">
                 <h2 class="mb-5">Settings</h2>
-                <h4>Personal Info and Privacy</h4><br>
+                <h3 class="mb-0">Personal Info and Privacy</h3><br>
                 <form class="change-details-form" method="POST" action="/users/change">
 
-                    Registered email id:<br>
+                    Registered Email id:<br>
                     <input type="email" name="email" id="text_email" disabled value="<%= email%>" size="35">
-                    <input type="button" id="button_email" value="edit" onclick="enableButtonEmail()" /><br>
+                    <input type="button" id="button_email" class="btn btn-info" value="Edit" onclick="enableButtonEmail()" /><br>
                     <br>
 
                     New Password:<br>
                     <input type="password" name="password" id="text_password" disabled value="" size="35">
-                    <input type="button" id="button_pass" value="edit" onclick="enableButtonPassword()" /><br>
+                    <input type="button" id="button_pass" class="btn btn-info" value="Edit" onclick="enableButtonPassword()" /><br>
                     <input type="checkbox" id="showPass" onclick="ShowPassword()" disabled> Show Password<br>
                     <br>
                     <input type="submit" value="Save" id="Save_changes" disabled>
@@ -100,10 +100,35 @@
                 </script>
             </div>
             <div class="my-auto">
-                <h3 class="mb-0">Contributer
+                <h3 class="mb-0">Notifications</h3><br>
+                <form method="POST" action="/users/email">
+                    Email Notifications
+                    <label class="switch">
+                        <input type="checkbox" name="email_check" onclick="email_notif()" id="email_notify" value="<%= emailNotification%>" <% if(emailNotification==1){%>checked<%}%> >
+                        <span class="slider round"></span>
+                    </label>
+                    <br>
+                    <input type = "submit" class="btn btn-info" value = "Save Changes">
+                    <script>
+                        function email_notif(){
+                            var checkbox = document.getElementById('email_notify');
+                            if (checkbox.checked == true){
+                                //Enable email notificaitons
+                                checkbox.value = 1;
+                            }
+                            else{
+                                //Disable email notifications
+                                checkbox.value = 0;
+                            }
+                        }
+                    </script>
+                </form>
+            </div>
+            <div class="my-auto">
+                <h3 class="mb-0">Contributor
                 </h3>
-                <div class="subheading mb-5">List of Users you added as contributer
-                </div>
+                <br>
+                List of Users added as contributor
                 <ul>
                     <% for(var i=0; i<contributer.length; i++) {%>
                     <li>

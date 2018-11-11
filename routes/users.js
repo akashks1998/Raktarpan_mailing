@@ -39,6 +39,7 @@ class user {
     this.hour = 0;
     this.contributers = [];
     this.contribute = [];
+    this.emailNotify = 1;
   }
   load(obj) {
     this.nam = obj.nam;
@@ -57,6 +58,7 @@ class user {
     this.hour = obj.hour;
     this.contributers = obj.contributers;
     this.contribute = obj.contribute;
+    this.emailNotify = obj.emailNotify;
 
   }
   addfixed(start, end, name) {
@@ -311,6 +313,38 @@ router.post("/change", function (req, res, next) {
       return;
     });
 });
+
+router.post('/email', function(req, res){
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function () {
+    if(u1.verify==1){
+        if(req.body.email_check == 1)
+        {
+          console.log("Hiiiiiii");
+          u1.emailNotify = 1;
+          updateUser(u1);
+        }
+        else{
+          console.log("Noooooooo");
+          u1.emailNotify = 0;
+          updateUser(u1);
+        }
+        res.redirect("/users/settings");
+    }
+    else{
+      res.render('verification');
+    }
+  })
+  .catch(function () {
+    console.log("Unresolved");
+    res.render("index");
+    return;
+  });
+});
+
 router.get('/home',(req,res)=>{
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
@@ -424,7 +458,8 @@ router.get('/settings', (req, res) => {
     res.render("settings", {
       user: u1.nam,
       email: u1.email,
-      contributer: u1.contributers
+      contributer: u1.contributers,
+      emailNotification: u1.emailNotify
     });
   }).catch(function () {
     console.log("Unresolved");
@@ -927,7 +962,7 @@ setInterval(function () {
                     subject: 'Scheduler',
                     text: 'Current task is ' + temp.scedule[2]
                   };
-
+                  if(u1.emailNotify==1){
                   transporter.sendMail(mailOptions, function (error, info) {
                     if (error) {
                       console.log(error);
@@ -935,6 +970,7 @@ setInterval(function () {
                       console.log('Email sent: ' + info.response);
                     }
                   });
+                }
                 }
               ).catch(function () {
                 console.log("Sorry");
