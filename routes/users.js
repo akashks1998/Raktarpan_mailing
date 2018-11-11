@@ -318,7 +318,7 @@ router.get('/home',(req,res)=>{
   }
   checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function () {
     if(u1.verify==1){
-      res.render('home',{user:u1});
+      res.render('home',{user:u1,value:0});
     } else {
         res.render('verification');
       }
@@ -329,6 +329,27 @@ router.get('/home',(req,res)=>{
     return;
   });
 });
+
+router.get('/home/:val',(req,res)=>{
+  let value=req.params.val;
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(req.session.user, crypto.createHash("md5").update(req.session.pass).digest("hex")).then(function () {
+    if(u1.verify==1){
+      res.render('home',{user:u1,value:value});
+    } else {
+        res.render('verification');
+      }
+  })
+  .catch(function () {
+    console.log("Unresolved");
+    res.render("index");
+    return;
+  });
+});
+
 router.post('/addcontributer', function (req, res) {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
