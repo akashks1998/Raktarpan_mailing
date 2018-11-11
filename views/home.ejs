@@ -92,7 +92,12 @@
             <%=user.fixed[j][2]%>
           </div>
           <div id="fixed<%= i%>o<%=j%>d" class="dropdown-content">
-            <a class="tun" href="/users/<%= id%>edit/fixed/<%=user.fixed[j][3]%>/<%=value%>">Edit</a>
+            <div>
+              Type:Fixed<br>
+              Starting:<%=(new Date(user.fixed[j][0])).toLocaleString()%><br>
+              Ending:<%=(new Date(user.fixed[j][1])).toLocaleString()%>
+            </div>
+            <!-- <a class="tun" href="/users/<%= id%>edit/fixed/<%=user.fixed[j][3]%>/<%=value%>">Edit</a> -->
             <a class="tun" href="/users/<%= id%>delete/fixed/<%=user.fixed[j][3]%>/<%=value%>">Delete</a>
           </div>
           <%
@@ -111,7 +116,12 @@
             <%=user.deadline[j][2]%>
           </div>
           <div id="deadline<%= i%>o<%=j%>d" class="dropdown-content">
-            <a class="tun" href="/users/<%= id%>edit/deadline/<%=user.deadline[j][3]%>/<%=value%>">Edit</a>
+            <div>
+              Type:Deadline<br>
+              Deadline:<%=(new Date(user.deadline[j][0])).toLocaleString()%><br>
+              Hours left:<%=user.deadline[j][1]%>
+            </div>
+            <!-- <a class="tun" href="/users/<%= id%>edit/deadline/<%=user.deadline[j][3]%>/<%=value%>">Edit</a> -->
             <a class="tun" href="/users/<%= id%>delete/deadline/<%=user.deadline[j][3]%>/<%=value%>">Delete</a>
           </div>
           <%
