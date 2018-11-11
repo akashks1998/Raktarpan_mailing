@@ -270,8 +270,7 @@ router.post("/change", function (req, res, next) {
     .then(function (temp) {
       console.log("Resolve");
       if (u1.verify == 1) {
-        if (req.body.email != u1.email) {
-          u1.verify = 0;
+        if (req.body.email!=null&&req.body.email != u1.email) {
           let temp = randomstring.generate(7);
           let mailOptions = {
             from: 'kronoskumar252@gmail.com',
@@ -284,22 +283,23 @@ router.post("/change", function (req, res, next) {
             if (error) {
               console.log(error);
               res.send("Sorry, server error");
+              return;
             } else {
               u1.str = temp;
               u1.email = req.body.email;
+              u1.verify = 0;
               updateUser(u1);
-              res.redirect("/users");
               console.log('Email sent: ' + info.response);
-              return;
             }
           });
-        } else {
-          res.redirect("/users/settings");
         }
         if (req.body.password != '') {
           u1.pas = crypto.createHash("md5").update(req.body.password).digest("hex");
+          req.session.pass=req.body.password;
           updateUser(u1);
-          res.render("/users/");
+          res.redirect("/");
+        }else{
+          res.redirect('/');
         }
       } else {
         res.render('verification');
