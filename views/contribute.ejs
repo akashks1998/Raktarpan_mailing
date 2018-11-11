@@ -48,6 +48,9 @@
               <a class="nav-link js-scroll-trigger" href="/users/contribute">Contribute</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="/combo">Add Task</a>
+          </li>
+          <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="/logout">Logout</a>
           </li>
       </ul>
@@ -64,8 +67,8 @@
           <% for(var i=0; i<contribute.length; i++) {%>
           <li>
               <%= contribute[i] %>
-              <a href="/contribute/<%= contribute[i] %>/fixed"><button type="button" class="btn btn-info">Fixed Task</button></a>
-              <a href="/contribute/<%= contribute[i] %>/deadline"><button type="button" class="btn btn-info">Deadline task</button></a>
+              <a href="/contribute/<%= contribute[i] %>/combo"><button type="button" class="btn btn-info">Add Task</button></a>
+              <!-- <a href="/contribute/<%= contribute[i] %>/deadline"><button type="button" class="btn btn-info">Deadline task</button></a> -->
               <a href="/users/contribute/<%= contribute[i] %>/home"><button type="button" class="btn btn-info">View Schedule</button></a>
           </li>
           <% } %>

@@ -52,7 +52,7 @@ router.get('/combo', function(req, res, next) {
   let startt=calcTime(5.5);
   startt=startt.toISOString();
   startt=startt.slice(0, -8);
-  res.render('comboform',{start:startt,id:'/users'});
+  res.render('comboform',{start:startt,id1:'/users',id2:'/users'});
 });
 
 router.get('/addcontributer', function(req, res, next) {
@@ -78,7 +78,17 @@ router.get('/contribute/:id/deadline', function(req, res, next) {
   startt=startt.slice(0, -8);
   res.render('deadline',{start:startt,id:'/users/contributer/'+id+'/deadline'});
 });
-
+router.get('/contribute/:id/combo', function(req, res, next) {
+  let id=req.params.id;
+  if(req.session.user==undefined||req.session.pass==undefined){
+    res.render('index');
+    return;
+  }
+  let startt=calcTime(5.5);
+  startt=startt.toISOString();
+  startt=startt.slice(0, -8);
+  res.render('comboform',{start:startt,id1:'/users/contributer/'+id+'/deadline',id2:'/users/contributer/'+id+'/fixed'});
+});
 router.get('/contribute/:id/fixed', function(req, res, next) {
   let id=req.params.id;
 

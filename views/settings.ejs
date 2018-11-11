@@ -49,6 +49,9 @@
                     <a class="nav-link js-scroll-trigger" href="/users/contribute">Contribute</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link js-scroll-trigger" href="/combo">Add Task</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link js-scroll-trigger" href="/logout">Logout</a>
                 </li>
 
@@ -104,11 +107,13 @@
                 <form method="POST" action="/users/email">
                     Email Notifications
                     <label class="switch">
-                        <input type="checkbox" name="email_check" onclick="email_notif()" id="email_notify" value="<%= emailNotification%>" <% if(emailNotification==1){%>checked<%}%> >
+                        <input type="checkbox" name="email_check" onclick="email_notif()" id="email_notify" value="<%= emailNotification%>"
+                            <% if(emailNotification==1){%>checked
+                        <%}%> >
                         <span class="slider round"></span>
                     </label>
                     <br>
-                    <input type = "submit" class="btn btn-info" value = "Save Changes">
+                    <input type="submit" class="btn btn-info" value="Save Changes">
                     <script>
                         function email_notif(){
                             var checkbox = document.getElementById('email_notify');

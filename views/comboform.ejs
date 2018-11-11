@@ -5,7 +5,7 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <form method="POST" action='<%= id %>'>
+    <form method="POST" action='<%= id1 %>'>
       <input type="datetime-local" value='<%= start %>' placeholder="Deadline" name="deadline"><br>
       <input type="number" value="1" placeholder="Hours" name="hours"><br>
       <input type="text" placeholder="Name" name="name"><br>
@@ -48,41 +48,182 @@
 
     <div class="limiter">
         <div class="container-login100">
-            <div class="wrap-login100 p-t-85 p-b-20 ">
-                <form class="login100-form validate-form" method="POST" action="<%= id %>" style="margin-bottom:70px;">
-                    <span class="login100-form-title p-b-70">
-                        Add Deadline task
-                    </span>
-                    <span class="login100-form-avatar">
-                        <img src="/images/logo.png" alt="AVATAR">
-                    </span>
+            <div style="display:flex;flex-direction:column;">
 
+                <div class="wrap-login100 p-t-85 p-b-20 ">
+                    <div class="login-button-container clearfix">
 
-                    <div class="wrap-input100 validate-input m-t-85 m-b-35" data-validate="Enter Event name">
-                        <input class="input100" type="text" name="name">
-                        <span class="focus-input100" data-placeholder="Event name"></span>
+                        <div class="col-xs-6 sign-in">
+                            <button class="btn sign-in__button active">
+                                Add Fixed Time Task
+                            </button>
+                        </div>
+
+                        <div class="col-xs-6 register">
+                            <button class="btn register__button">
+                                Add Deadline Task
+                            </button>
+                        </div>
+
                     </div>
+                    <div class="row login__form">
+                        <form class="fixed login100-form validate-form" method="POST" action="<%= id2 %>" style="margin-bottom:70px;">
+                            <span class="login100-form-title p-b-70">
+                                Add Fixed time task
+                            </span>
 
-                    <div class="wrap-input100 validate-input  m-b-50" data-validate="Enter Deadline">
-                        <!-- <input class="input100" type="text" name="user"> -->
-                        <input type="datetime-local" class="input100" value='<%= start %>' placeholder="" name="deadline">
-                        <span class="focus-input100" data-placeholder="Deadline"></span>
-                    </div>
 
-                    <div class="wrap-input100 validate-input  m-b-50" data-validate="Enter Hours required">
-                        <input class="input100" type="number" name="hours">
-                        <span class="focus-input100" data-placeholder="Hours"></span>
-                    </div>
+                            <div class="wrap-input100 validate-input m-t-85 m-b-35" data-validate="Enter Event name">
+                                <input class="input100" type="text" name="name">
+                                <span class="focus-input100" data-placeholder="Event name"></span>
+                            </div>
 
-                    <div class="container-login100-form-btn">
-                        <button class="login100-form-btn">
-                            Add task
-                        </button>
+                            <div class="wrap-input100 validate-input  m-b-50" data-validate="Enter Start time">
+                                <!-- <input class="input100" type="text" name="user"> -->
+                                <input type="datetime-local" value='<%= start %>' class="input100" name="start">
+
+                                <span class="focus-input100" data-placeholder="Start time"></span>
+                            </div>
+
+                            <div class="wrap-input100 validate-input  m-b-50" data-validate="Enter end date">
+                                <input type="datetime-local" value='<%= start %>' class="input100" name="end">
+                                <span class="focus-input100" data-placeholder="End time"></span>
+                            </div>
+
+                            <div class="container-login100-form-btn">
+                                <button class="login100-form-btn">
+                                    Add task
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                </form>
-                <hr class="m-0">
-                <form class="login100-form validate-form" method="POST" action="<%= id %>">
-                    <span class="login100-form-title p-b-70">
+                    <div class="row register__form">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="round-button">
+        <div class="round-button-circle"><a href="/users" class="round-button"><img src="/images/icons/favicon.ico"
+                    width="35" height="35"></a></div>
+    </div>
+
+    <style>
+        .login-button-container {
+            margin: 32px -15px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .sign-in {
+            padding-left: 0;
+        }
+
+        .register {
+            padding-right: 0;
+        }
+
+        .sign-in__button,
+        .register__button {
+            background-color: white;
+            border: 1px solid grey;
+            display: block;
+            min-height: 60px;
+            width: 100%;
+        }
+
+        .sign-in__button:hover,
+        .register__button:hover {
+            background: none;
+            border: 1px solid #ccc;
+            color: green;
+        }
+
+        .sign-in__button:active,
+        .sign-in__button.active,
+        .register__button:active,
+        .register__button.active {
+            background-color: #ccc;
+            border: 1px solid pink;
+            box-shadow: none;
+        }
+
+
+
+
+        .round-button {
+            right: 0;
+            bottom: 0;
+            position: fixed;
+            width: 15vh;
+            height: 15vh;
+            ;
+        }
+
+        .round-button-circle {
+            position: relative;
+            width: 50%;
+            height: 50%;
+            padding-bottom: 50%;
+            border-radius: 50%;
+
+            background: rgb(218, 1, 1);
+        }
+
+        .round-button-circle:hover {
+            background: #30588e;
+        }
+
+        .round-button a {
+            position: relative;
+            display: block;
+            float: left;
+            width: 100%;
+            padding-top: 47%;
+            padding-bottom: 30%;
+            line-height: 1em;
+            margin-top: -0.5em;
+
+            opacity: 1;
+            text-align: center;
+            color: #e6d4d4;
+            font-family: Verdana;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+
+    <div id="dropDownSelect1"></div>
+
+    <!--===============================================================================================-->
+    <script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="/vendor/animsition/js/animsition.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="/vendor/bootstrap/js/popper.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="/vendor/select2/select2.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="/vendor/daterangepicker/moment.min.js"></script>
+    <script src="/vendor/daterangepicker/daterangepicker.js"></script>
+    <!--===============================================================================================-->
+    <script src="/vendor/countdowntime/countdowntime.js"></script>
+    <!--===============================================================================================-->
+    <script src="/js/main.js"></script>
+    <script>
+        $('.register__form').hide();
+
+        $('.sign-in__button').click(function (e) {
+            e.preventDefault();
+            $(this).addClass('active');
+            $('.register__button').removeClass('active');
+            $('.register__form').html('');
+            $('.login__form').html(
+                `<form class="fixed login100-form validate-form" method="POST" action="<%= id2 %>" style="margin-bottom:70px;">
+                <span class="login100-form-title p-b-70">
                         Add Fixed time task
                     </span>
 
@@ -109,72 +250,54 @@
                             Add task
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="round-button"><div class="round-button-circle"><a href="/users" class="round-button"><img src="/images/icons/favicon.ico" width="35" height="35"></a></div></div>
+                </form>`
+            );
+            $('.login__form').show();
+            $('.register__form').hide();
+            $('#edit-email').focus(); //Should appear after $('.login__form').show(); because if it's before that, the register form doesn't exist in the DOM
+        });
 
-    <style>
-      .round-button {
-        right: 0;
-        bottom: 0;
-        position: fixed;
-        width:15vh;
-        height: 15vh;;
-    }
-    .round-button-circle {
-      position: relative;
-      width: 50%;
-      height:50%;
-      padding-bottom:50%;
-      border-radius: 50%;
-            
-      background: rgb(218, 1, 1); 
-    }
-    .round-button-circle:hover {
-      background:#30588e;
-    }
-    .round-button a {
-      position: relative;
-      display:block;
-      float:left;
-      width:100%;
-      padding-top:47%;
-      padding-bottom:30%;
-      line-height:1em;
-      margin-top:-0.5em;
-            
-      opacity: 1;
-      text-align:center;
-      color:#e6d4d4;
-      font-family:Verdana;
-      font-size:2.5em;
-      font-weight:bold;
-      text-decoration:none;
-    }
-    
-      </style>
+        $('.register__button').click(function (e) {
+            e.preventDefault();
+            $(this).addClass('active');
+            $('.login__form').html('');
+            $('.register__form').html(
+                `<form class="deadline login100-form validate-form" method="POST" action="<%= id1 %>">
+                    <span class="login100-form-title p-b-70">
+                        Add Deadline task
+                    </span>
+                    
 
-    <div id="dropDownSelect1"></div>
 
-    <!--===============================================================================================-->
-    <script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="/vendor/animsition/js/animsition.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="/vendor/bootstrap/js/popper.js"></script>
-    <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="/vendor/select2/select2.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="/vendor/daterangepicker/moment.min.js"></script>
-    <script src="/vendor/daterangepicker/daterangepicker.js"></script>
-    <!--===============================================================================================-->
-    <script src="/vendor/countdowntime/countdowntime.js"></script>
-    <!--===============================================================================================-->
-    <script src="/js/main.js"></script>
+                    <div class="wrap-input100 validate-input m-t-85 m-b-35" data-validate="Enter Event name">
+                        <input class="input100" type="text" name="name">
+                        <span class="focus-input100" data-placeholder="Event name"></span>
+                    </div>
 
+                    <div class="wrap-input100 validate-input  m-b-50" data-validate="Enter Deadline">
+                        <!-- <input class="input100" type="text" name="user"> -->
+                        <input type="datetime-local" class="input100" value='<%= start %>' placeholder="" name="deadline">
+                        <span class="focus-input100" data-placeholder="Deadline"></span>
+                    </div>
+
+                    <div class="wrap-input100 validate-input  m-b-50" data-validate="Enter Hours required">
+                        <input class="input100" type="number" name="hours">
+                        <span class="focus-input100" data-placeholder="Hours"></span>
+                    </div>
+
+                    <div class="container-login100-form-btn">
+                        <button class="login100-form-btn">
+                            Add task
+                        </button>
+                    </div></form>`
+            );
+
+            $('.sign-in__button').removeClass('active');
+            $('.register__form').show();
+            $('.login__form').hide();
+            $('#edit-firstname').focus(); //Should appear after $('.register__form').show(); because if it's before that, the register form doesn't exist in the DOM
+        });
+    </script>
 </body>
 
 </html>
