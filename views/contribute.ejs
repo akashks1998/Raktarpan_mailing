@@ -58,15 +58,15 @@
 
     <section class="resume-section p-3 p-lg-5 d-flex d-column" id="about">
       <div class="my-auto">
-        <h1 class="mb-0">Contribute
-        </h1>
+          <h2 class="mb-5">Contribute</h2>
         List of Users who have added you as a contributor
         <ul>
           <% for(var i=0; i<contribute.length; i++) {%>
           <li>
-              <%= contribute[i] %><br>
-              <a href="/contribute/<%= contribute[i] %>/fixed"><button type="button" class="btn btn-success">Fixed Task</button></a>
-                <a href="/contribute/<%= contribute[i] %>/deadline"><button type="button" class="btn btn-info">Deadline task</button></a>
+              <%= contribute[i] %>
+              <a href="/contribute/<%= contribute[i] %>/fixed"><button type="button" class="btn btn-info">Fixed Task</button></a>
+              <a href="/contribute/<%= contribute[i] %>/deadline"><button type="button" class="btn btn-info">Deadline task</button></a>
+              <a href="/users/contribute/<%= contribute[i] %>/home"><button type="button" class="btn btn-info">View Schedule</button></a>
           </li>
           <% } %>
         </ul>
