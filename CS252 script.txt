@@ -1,0 +1,35 @@
+Hello everyone.
+
+Today we the members of team “Radicals” present to you “Kronos” (The God of Time), a scheduler web app which would help in better organising and managing your day-to-day tasks.
+
+The user first registers itself with the portal, via the Signup page, by providing the required details. Then, user needs to verify his email address.
+Following the registration, to access the account, one then logins with the registered credentials.
+
+The user is then welcomed to the home page of the Scheduler. It shows the scheduled tasks for the next fifteen days. The list can be manipulated using the arrow buttons below.
+
+The home page lists all the scheduled tasks of the logged-in user. You can click on any task to view its details or delete it from your planner.
+To add new tasks, click on the “Add new” button on bottom right or “add task” url in the side menu. 
+
+Tasks can be scheduled in one of the two categories, “Fixed” task or “Deadline task”.
+
+For tasks like lectures, meetings or things which occupies some complete interval of time, the user schedules a “fixed” task. The user gives a name to the task and enters it start and end time and then schedules it.
+Similarly, for tasks like assignments or project deadlines, the preferred category is “deadline” tasks. Again, the user needs to give the task a name, enter its start time, end time and the number of hours, approximated by the user, for its completion. 
+
+Once the user adds a task, it appears on his/her list.
+
+Currently scheduled task is shown at the top of the Homepage and the user receives an hourly notification of the scheduled task via email.
+
+The user gets the privilege to add contributors, giving them the permission to add or delete a task on the his/her planner.
+
+The user can also change the password or the registered email id under the Settings tab. He can also see the list of contributors and add or remove contributor in this settings tab. One can also enable/disable the hourly email notification service that the scheduler provides in settings tab.
+One gets to view the list of all such users who have added you as a contributor in contribute section, he can also view their task list or create a task for them.
+
+
+
+
+
+
+For multiple tasks with deadline, priority is given to those whose deadline is early and the next prior task move up the hierarchy once the former has ended.
+How is the currently scheduled task decided?
+Future prospects
+Scope of improvement
