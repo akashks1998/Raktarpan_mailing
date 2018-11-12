@@ -7,3 +7,4 @@ Credits:
 - Photography club for background image.
 - startbootstrap.com for main home page styling.
 - colorlib.com for forms styling.
+- w3schools for tables and auto suggession.
