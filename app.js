@@ -21,7 +21,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-      expires: 600000
+    // secure:true
+      // expires: 600000
   }
 }));
 app.use(logger('dev'));
@@ -66,7 +67,12 @@ app.get('*', function(req, res) { res.render('404', { title: 'Page Not Found'});
 app.use(function(req, res, next) {
   next(createError(404));
 });
+app.post('*', function(req, res) { res.render('404', { title: 'Page Not Found'}); });
 
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development

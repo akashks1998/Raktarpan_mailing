@@ -220,6 +220,7 @@ function checkLogin(userName, pass) {
           pas: pass
         };
         //console.log(query.pas);
+        
         dbo
           .collection("users")
           .find(query)
@@ -809,6 +810,59 @@ router.get("/home/:val", (req, res) => {
     });
 });
 
+router.get("/contributer", function (req, res) {
+  if (req.session.user == undefined || req.session.pass == undefined) {
+    res.render("index");
+    return;
+  }
+  checkLogin(
+      req.session.user,
+      crypto
+      .createHash("md5")
+      .update(req.session.pass)
+      .digest("hex")
+    )
+    .then(function () {
+      let userexits = new Promise(function (resolve, rej) {
+        MongoClient.connect(
+          url,
+          function (err, db) {
+            if (err) throw err;
+            let dbo = db.db("users");
+            dbo.collection('users').aggregate(
+              [{"$group":{"_id":"$nam"}}]
+            ).toArray(
+              (err,result)=>{
+                //console.log(result);
+                resolve(result);
+              }
+            );
+            db.close();
+          }
+        );
+      });
+      userexits
+        .then((result) => {
+          let temp=[];
+          for(let i=0;i<result.length;i++){
+            temp.push(result[i]._id);
+            if(i==result.length-1){
+              console.log(temp);
+              res.render("addcontributer",{users:temp});
+            }
+          }
+          
+        })
+        .catch(() => {
+          res.send("Sorry, User doesn't exist");
+        });
+    })
+    .catch(function () {
+      //console.log("Unresolved");
+      res.render("index");
+      return;
+    });
+});
 router.post("/addcontributer", function (req, res) {
   if (req.session.user == undefined || req.session.pass == undefined) {
     res.render("index");
