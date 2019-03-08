@@ -54,7 +54,7 @@ router.post("/send",(req,res)=>{
     
       transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-          res.send("Sorry, server error");
+          res.send("Sorry, server error"+error);
           return;
         } else {
           res.render("sent");
