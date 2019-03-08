@@ -1,9 +1,23 @@
 # Backend
-Backend for Kronos.
-<a href="https://kronos252.herokuapp.com/">Live Link</a><br>
-<a href="https://www.youtube.com/watch?v=cX4EdYobt20&feature=youtu.be">Demo Link</a>
+Backend for Raktarpan.
+<a href="https://raktarpan.herokuapp.com/">Live Link</a><br>
 
-Credits:
+### How to use
+```
+npm install
+export email="<Email>"
+export emailpass="<Password>" 
+export pass="<Password>" 
+npm start
+```
+Site will be hosted at localhost:8000 
+Heroku remote is https://git.heroku.com/raktarpan.git
+To set envornment variable at heroku
+```
+heroku config:set email=""  emailpass="" pass=""
+```
+
+#### Credits:
 - Photography club for background image.
 - startbootstrap.com for main home page styling.
 - colorlib.com for forms styling.
