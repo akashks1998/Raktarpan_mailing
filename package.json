@@ -1,5 +1,5 @@
 {
-  "name": "mywebsite",
+  "name": "raktarpan",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,6 @@
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
     "cookies-parser": "^1.2.0",
-    "crypto": "^1.0.1",
     "debug": "~2.6.9",
     "ejs": "~2.5.7",
     "express": "~4.16.0",
@@ -19,5 +18,18 @@
     "morgan": "~1.9.0",
     "nodemailer": "^4.6.8",
     "randomstring": "^1.1.5"
-  }
+  },
+  "description": "Backend for Kronos. <a href=\"https://kronos252.herokuapp.com/\">Live Link</a><br> <a href=\"https://www.youtube.com/watch?v=cX4EdYobt20&feature=youtu.be\">Demo Link</a>",
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kronos252/backend.git"
+  },
+  "author": "Akash Kumar Singh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kronos252/backend/issues"
+  },
+  "homepage": "https://github.com/kronos252/backend#readme"
 }

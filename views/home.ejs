@@ -1,330 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
-
-  <title>Kronos</title>
-
-  <!-- Bootstrap core CSS -->
-  <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Custom fonts for this template -->
-  <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet">
-  <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-
-  <!-- Custom styles for this template -->
-  <link href="/css/resume.css" rel="stylesheet">
-
+	<title>Raktarpan</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->	
+	<link rel="icon" type="image/png" href="/images/icons/favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/vendor/bootstrap/css/bootstrap.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/fonts/iconic/css/material-design-iconic-font.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/vendor/animate/animate.css">
+<!--===============================================================================================-->	
+	<link rel="stylesheet" type="text/css" href="/vendor/css-hamburgers/hamburgers.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/vendor/animsition/css/animsition.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/vendor/select2/select2.min.css">
+<!--===============================================================================================-->	
+	<link rel="stylesheet" type="text/css" href="/vendor/daterangepicker/daterangepicker.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/css/util.css">
+	<link rel="stylesheet" type="text/css" href="/css/main.css">
+<!--===============================================================================================-->
 </head>
-
-<body id="page-top">
-
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
-    <a class="navbar-brand js-scroll-trigger" href="#page-top">
-      <span class="d-block d-lg-none">Kronos</span>
-      <span class="d-none d-lg-block">
-        <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="/images/logo.png" alt="">
-      </span>
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="/users">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="/users/settings">Settings</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="/combo">Add Task</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="/users/contribute">Contribute</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="/logout">Logout</a>
-        </li>
-
-      </ul>
-    </div>
-  </nav>
-
-  <div class="container-fluid p-0">
-<h2><%=us%> Planner</h2>
-<h3>Presently Scheduled task: <%=user.scedule[2]%></h3>
-    <table class="w3-table-all">
-      <thead>
-
-        <tr class="w3-green">
-          <th>Date</th>
-          <th>Task name</th>
-          <th>Type</th>
-        </tr>
-      </thead>
-      <%
-      function calcTime(offset) {
-        d = new Date();
-        utc = d.getTime() ;
-         <!-- (d.getTimezoneOffset() * 60000); -->
-        return new Date(utc + (3600000*offset));
-      }
-            let temp=calcTime(5.5);
-            let tomorrow = new Date(temp.toLocaleDateString("en-US"));
-            tomorrow.setDate(tomorrow.getDate() -1);
-            let options = { year: 'numeric', month: 'long', day: 'numeric' };
-            if(value!=null){
-              tomorrow.setDate(tomorrow.getDate() + parseInt(value,10));
-            }
-            %>
-      <% for(let i=0; i<15; i++,tomorrow.setDate(tomorrow.getDate() + 1)) {%>
-      <tr>
-        <td>
-          <%=tomorrow.toLocaleDateString("en-US",options)%>
-        </td>
-        <td>
-          <% for(let j=0; j<user.fixed.length; j++) {
-            let x= tomorrow;
-            if(tomorrow.getTime()<=(new Date(user.fixed[j][1])).getTime()){
-              x.setDate(tomorrow.getDate() + 1);
-
-              if((new Date(user.fixed[j][0])).getTime()<=x.getTime()){
-              %>
-          <div onclick="myFunction(this)" id="fixed<%= i%>o<%=j%>" class="dropbtn">
-            <%=user.fixed[j][2]%>
-          </div>
-          <div id="fixed<%= i%>o<%=j%>d" class="dropdown-content">
-            <div>
-              Type:Fixed<br>
-              Starting:<%=(new Date(user.fixed[j][0])).toLocaleString()%><br>
-              Ending:<%=(new Date(user.fixed[j][1])).toLocaleString()%>
-            </div>
-            <!-- <a class="tun" href="/users/<%= id%>edit/fixed/<%=user.fixed[j][3]%>/<%=value%>">Edit</a> -->
-            <a class="tun" href="/users/<%= id%>delete/fixed/<%=user.fixed[j][3]%>/<%=value%>">Delete</a>
-          </div>
-          <%
-              
-            }
-            x.setDate(tomorrow.getDate() -1);
-          }
-           } %>
-          <% for(let j=0; j<user.deadline.length; j++) {
-            let x= tomorrow;
-            if(tomorrow.getTime()<=(new Date(user.deadline[j][0])).getTime()){
-            x.setDate(tomorrow.getDate() + 1);
-            if((new Date(user.deadline[j][0])).getTime()<=x.getTime()){
-              %>
-          <div onclick="myFunction(this)" id="deadline<%= i%>o<%=j%>" class="dropbtn">
-            <%=user.deadline[j][2]%>
-          </div>
-          <div id="deadline<%= i%>o<%=j%>d" class="dropdown-content">
-            <div>
-              Type:Deadline<br>
-              Deadline:<%=(new Date(user.deadline[j][0])).toLocaleString()%><br>
-              Hours left:<%=user.deadline[j][1]%>
-            </div>
-            <!-- <a class="tun" href="/users/<%= id%>edit/deadline/<%=user.deadline[j][3]%>/<%=value%>">Edit</a> -->
-            <a class="tun" href="/users/<%= id%>delete/deadline/<%=user.deadline[j][3]%>/<%=value%>">Delete</a>
-          </div>
-          <%
-
-            }
-            x.setDate(tomorrow.getDate() -1);
-  
-          }
-           } %>
-        </td>
-        <td>
-          <% for(let j=0; j<user.fixed.length; j++) {
-              let x= tomorrow;
-              if(tomorrow.getTime()<=(new Date(user.fixed[j][1])).getTime()){
-                x.setDate(tomorrow.getDate() + 1);
-  
-                if((new Date(user.fixed[j][0])).getTime()<=x.getTime()){
-                %>
-          Fixed<br>
-          <%
-                
-              }
-              x.setDate(tomorrow.getDate() -1);
-            }
-             } %>
-          <% for(let j=0; j<user.deadline.length; j++) {
-              let x= tomorrow;
-              if(tomorrow.getTime()<=(new Date(user.deadline[j][0])).getTime()){
-              x.setDate(tomorrow.getDate() + 1);
-              if((new Date(user.deadline[j][0])).getTime()<=x.getTime()){
-                %>
-          Deadline<br>
-          <%
-  
-              }
-              x.setDate(tomorrow.getDate() -1);
-    
-            }
-             } %>
-
-        </td>
-      </tr>
-      <% } %>
-    </table>
-    <div class="center">
-      <a href="/users/<%= id%>home/<%=parseInt(value,10)-5%>" class="next round cc">
-        <</a> <a href="/users/<%= id%>home/<%=parseInt(value,10)+5%>" class="next round cc">>
-      </a>
-    </div>
-  </div>
-  <div class="round-button">
-    <div class="round-button-circle"><a href="/<%=id%>combo" class="round-button">+</a></div>
-  </div>
-
-  <style>
-    .center {
-      margin-left: 50%;
-      margin-right: 50%;
-      width: 20vw;
-    }
-
-    .round-button {
-      right: 0;
-      bottom: 0;
-      position: fixed;
-      width: 15vh;
-      height: 15vh;
-      ;
-    }
-
-    .round-button-circle {
-      position: relative;
-      width: 50%;
-      height: 50%;
-      padding-bottom: 50%;
-      border-radius: 50%;
-
-      background: rgb(218, 1, 1);
-    }
-
-    .round-button-circle:hover {
-      background: #30588e;
-    }
-
-    .round-button a {
-      position: relative;
-      display: block;
-      float: left;
-      width: 100%;
-      padding-top: 47%;
-      padding-bottom: 30%;
-      line-height: 1em;
-      margin-top: -0.5em;
-
-      opacity: 1;
-      text-align: center;
-      color: #e6d4d4;
-      font-family: Verdana;
-      font-size: 2.5em;
-      font-weight: bold;
-      text-decoration: none;
-    }
-
-    .cc {
-      text-decoration: none;
-      display: inline-block;
-      padding: 16px 16px;
-      font-size: 15px;
-    }
-
-    .cc:hover {
-      background-color: #ddd;
-      color: black;
-      text-decoration: none;
-    }
-
-    .next {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    .round {
-      border-radius: 50%;
-    }
-  </style>
-  <style>
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #f1f1f1;
-      min-width: 160px;
-      overflow: auto;
-      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-      z-index: 1;
-    }
-
-    .dropdown-content a {
-      color: black;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-    }
-
-    .tun:hover {
-      background-color: #ddd;
-    }
-
-    .show {
-      display: block;
-    }
-  </style>
+<body>
+	
+	<div class="limiter">
+		<div class="container-login100">
+			<div class="wrap-login100 p-t-85 p-b-20">
+        <form class="login100-form validate-form" method="POST" action="/users/send">
+					<span class="login100-form-title p-b-70">
+						Donor form
+					</span>
+					<span class="login100-form-avatar">
+						<img src="/images/logo.png" alt="AVATAR">
+					</span>
 
 
-  <!-- <div onclick="myFunction(this)" class="dropbtn">Dropdown</div>
-        <div id="myDropdown" class="dropdown-content">
-          <a class="tun" href="#home">Home</a>
-          <a class="tun" href="#about">About</a>
-          <a class="tun" href="#contact">Contact</a>
-        </div> -->
+					<div class="wrap-input100 validate-input m-t-85 m-b-35" data-validate="Enter Donor's E-mail">
+            <input class="input100" type="text" name="email">
+						<span class="focus-input100" data-placeholder="E-mail"></span>
+					</div>
+          <div class="wrap-input100 validate-input m-t-85 m-b-35" data-validate="Enter Disease">
+            <input class="input100" type="text" name="disease">
+						<span class="focus-input100" data-placeholder="Disease"></span>
+					</div>
+          
+					<div class="container-login100-form-btn">
+						<button class="login100-form-btn">
+							Send
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 
-  <script>
-    /* When the user clicks on the button, 
-      toggle between hiding and showing the dropdown content */
-    function myFunction(ele) {
-      document.getElementById(ele.id + "d").classList.toggle("show");
-    }
-
-    // Close the dropdown if the user clicks outside of it
-    window.onclick = function (event) {
-      if (!event.target.matches('.dropbtn')) {
-
-        var dropdowns = document.getElementsByClassName("dropdown-content");
-        var i;
-        for (i = 0; i < dropdowns.length; i++) {
-          var openDropdown = dropdowns[i];
-          if (openDropdown.classList.contains('show')) {
-            openDropdown.classList.remove('show');
-          }
-        }
-      }
-    }
-  </script>
-  <!-- Bootstrap core JavaScript -->
-  <script src="/vendor/jquery/jquery.min.js"></script>
-  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Plugin JavaScript -->
-  <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
-
-  <!-- Custom scripts for this template -->
-  <script src="/js/resume.min.js"></script>
+	
+<!--===============================================================================================-->
+	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+	<script src="/vendor/animsition/js/animsition.min.js"></script>
+<!--===============================================================================================-->
+	<script src="/vendor/bootstrap/js/popper.js"></script>
+	<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+	<script src="/vendor/select2/select2.min.js"></script>
+<!--===============================================================================================-->
+	<script src="/vendor/daterangepicker/moment.min.js"></script>
+	<script src="/vendor/daterangepicker/daterangepicker.js"></script>
+<!--===============================================================================================-->
+	<script src="/vendor/countdowntime/countdowntime.js"></script>
+<!--===============================================================================================-->
+	<script src="/js/main.js"></script>
 
 </body>
-
 </html>

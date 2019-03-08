@@ -7,8 +7,6 @@ let logger = require('morgan');
 let session = require('express-session');
 let sess;
 
-
-let indexRouter = require('./routes/index');
 let usersRouter = require('./routes/users');
 
 let app = express();
@@ -33,27 +31,25 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + '/public'));
-app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.get("/",(req,res)=>{
+  res.render("index");
+});
 app.post('/login',function(req,res){
   sess = req.session;
 //In this we are assigning email to sess.email letiable.
 //email comes from HTML page.
   
   sess.pass=req.body.pass;
-  sess.user=req.body.user;
   res.redirect('/users');
 });
 app.post('/logout',function(req,res){
   req.session.destroy();
 //In this we are assigning email to sess.email letiable.
 //email comes from HTML page.
-  res.redirect('/users');
+  res.redirect('/');
 });
-app.get('/signup',function(req,res,next){
-  req.session.destroy();
-  res.render("signup");
-});
+
 app.get('/logout',function(req,res){
   req.session.destroy();
 //In this we are assigning email to sess.email letiable.
@@ -83,5 +79,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
+app.listen(8000, () => {
+  console.log('Example app listening on port 8000!')
+});
 module.exports = app;
