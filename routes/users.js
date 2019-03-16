@@ -54,9 +54,19 @@ router.post("/send",(req,res)=>{
       let mailOptions = {
         from: email,
         to: req.body.email,
-        subject: "Congrats",
-        text: "We are glad to inform you that your blood has saved 1 life. It is used to treat a patient with "+req.body.disease
-      };
+        subject: "YOU ARE A HERO",
+        text: `
+        Hello
+        Greetings from  Raktarpan.!.
+        
+        We are very grateful to inform you that the blood you donated has saved one patient with `+req.body.disease +`. You have played your part in saving a live. Insofar, you deserve a big hand. Society needs more folks like you.
+
+        We will appreciate if you continue to donate in future camps also.
+        Thanks again for supporting this cause and for your contribution to it. 
+        
+        Regards,
+        Team Raktarpan
+        `};
     
       transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
