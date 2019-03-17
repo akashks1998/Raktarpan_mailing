@@ -44,7 +44,7 @@ app.post('/login',function(req,res){
 const hash = crypto.createHmac('sha256', secret)
                    .update(req.body.pass)
                    .digest('hex');
-  res.cookie("pass", hash);
+  res.cookie("pass", hash,{sameSite:Strict});
   sess.pass=req.body.pass;
   res.redirect('/users');
 });
