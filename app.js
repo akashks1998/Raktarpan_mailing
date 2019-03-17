@@ -38,14 +38,10 @@ app.get("/",(req,res)=>{
   res.redirect("/users");
 });
 app.post('/login',function(req,res){
-  sess = req.session;
-//In this we are assigning email to sess.email letiable.
-//email comes from HTML page.
 const hash = crypto.createHmac('sha256', secret)
                    .update(req.body.pass)
                    .digest('hex');
-  res.cookie("pass", hash,{sameSite:Strict});
-  sess.pass=req.body.pass;
+  res.cookie("pass", hash,{sameSite:"Strict"});
   res.redirect('/users');
 });
 app.post('/logout',function(req,res){
