@@ -6,6 +6,9 @@ let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 let session = require('express-session');
 let sess;
+const crypto = require('crypto');
+
+const secret = 'abcdefg';
 
 let usersRouter = require('./routes/users');
 
@@ -19,8 +22,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    // secure:true
-      // expires: 600000
+    secure:true
   }
 }));
 app.use(logger('dev'));
@@ -33,18 +35,22 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + '/public'));
 app.use('/users', usersRouter);
 app.get("/",(req,res)=>{
-  res.render("index");
+  res.redirect("/users");
 });
 app.post('/login',function(req,res){
   sess = req.session;
 //In this we are assigning email to sess.email letiable.
 //email comes from HTML page.
-  
+const hash = crypto.createHmac('sha256', secret)
+                   .update(req.body.pass)
+                   .digest('hex');
+  res.cookie("pass", hash);
   sess.pass=req.body.pass;
   res.redirect('/users');
 });
 app.post('/logout',function(req,res){
   req.session.destroy();
+  res.clearCookie('pass'); 
 //In this we are assigning email to sess.email letiable.
 //email comes from HTML page.
   res.redirect('/');
@@ -52,6 +58,7 @@ app.post('/logout',function(req,res){
 
 app.get('/logout',function(req,res){
   req.session.destroy();
+  res.clearCookie('pass'); 
 //In this we are assigning email to sess.email letiable.
 //email comes from HTML page.
   res.redirect('/');
