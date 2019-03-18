@@ -41,7 +41,7 @@ app.post('/login',function(req,res){
 const hash = crypto.createHmac('sha256', secret)
                    .update(req.body.pass)
                    .digest('hex');
-  res.cookie("pass", hash,{sameSite:"Strict"});
+  res.cookie("pass", hash,{sameSite:"Strict",expires: new Date(253402300000000)});
   res.redirect('/users');
 });
 app.post('/logout',function(req,res){
